@@ -32,8 +32,8 @@ Clone the repository and install dependencies:
 
 ```bash
 # Clone the repository
-git clone https://github.com/autocoast/remote-sensing-labelling-tool.git
-cd remote-sensing-labelling-tool
+git clone https://github.com/autocoast/senselabel.git
+cd senselabel
 
 # Install dependencies
 npm install
