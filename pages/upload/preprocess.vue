@@ -364,15 +364,12 @@ const loadGeoTIFF = async (file: File) => {
 
 onMounted(async () => {
 
-    console.log(uploadStore.selectedSatellite);
+
     if (uploadStore.selectedSatellite === SatelliteType.sentinels2l1c) {
-        console.log('a');
         bands.value = config['sentinel-s2-l1c-bands'];
     } else if (uploadStore.selectedSatellite === SatelliteType.sentinels2l2a) {
-        console.log('e');
         bands.value = config['sentinel-s2-l2a-bands'];
     } else if (uploadStore.selectedSatellite === SatelliteType.landsat8toa) {
-        console.log('toa bands')
         bands.value = config['landsat-8-toa-bands'];
     }
 
