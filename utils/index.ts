@@ -435,3 +435,7 @@ export function getCanvasTemplate(labelStore: any, canvasId: string, tooltips: s
     return canvas;
 
 }
+
+export function isLayerFile(layerName: string) {
+    return layerName.endsWith('.tif') || layerName.endsWith('.tiff') || layerName.endsWith('.png') || layerName.endsWith('.jpg') || layerName.endsWith('.jpeg') || layerName.endsWith('.bmp');
+}

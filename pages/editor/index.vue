@@ -485,15 +485,26 @@ watch(() => navStore.currentLinkIndex, () => {
 
 async function loadEditor() {
 
+    if (document) {
+        document.querySelector('[id^="permanent_legend___"]')?.remove();
+        document.querySelector('[id^="legend___"]')?.remove();
+    }
+
     await settingStore.loadSettings();
     HotkeyHandler.getInstance();
 
+    let otherLayers: string[] = [];
+    let folderIndex = 0;
+    let folderName = '';
+    let currentFolderName = '';
+    let linkList: string[] = []
     // uploadStore.selectedSatellite = 'sentinel-2';
     if (!_.has(route.query, 'example')) {
-        let folderIndex = 0;
-        let folderName = '';
-        let linkList: string[] = []
+
         for (let i = 0; i < uploadStore.uploadedFiles.length; i++) {
+
+            let currentUploadFileName = uploadStore.uploadedFiles[i].webkitRelativePath.split('/')[2];
+
             if (folderName === '') {
                 folderName = uploadStore.uploadedFiles[i].webkitRelativePath.split('/')[1];
                 linkList.push(folderName);
@@ -506,17 +517,39 @@ async function loadEditor() {
             }
 
             if (folderIndex === navStore.currentLinkIndex) {
+                currentFolderName = folderName;
                 if (uploadStore.selectedSatellite === SatelliteType.sentinels2l2a) {
+                    let found = false;
                     for (const [key, value] of Object.entries(uploadStore.sentinels2aAssignment)) {
-                        if (value === uploadStore.uploadedFiles[i].webkitRelativePath.split('/')[2]) {
+                        if (value === currentUploadFileName) {
                             await loadBandByFile(key.replace('Band ', 'B').toUpperCase(), uploadStore.uploadedFiles[i]);
+                            found = true;
                         }
                     }
+                    if (!found && isLayerFile(currentUploadFileName)) {
+                        otherLayers.push(uploadStore.uploadedFiles[i].name);
+                    }
                 } else if (uploadStore.selectedSatellite === SatelliteType.landsat8toa) {
+                    let found = false;
                     for (const [key, value] of Object.entries(uploadStore.landsat8toaAssignment)) {
-                        if (value === uploadStore.uploadedFiles[i].webkitRelativePath.split('/')[2]) {
+                        if (value === currentUploadFileName) {
                             await loadBandByFile(key.replace('Band ', 'B').toUpperCase(), uploadStore.uploadedFiles[i]);
+                            found = true;
                         }
+                    }
+                    if (!found && isLayerFile(currentUploadFileName)) {
+                        otherLayers.push(uploadStore.uploadedFiles[i].name);
+                    }
+                } else if (uploadStore.selectedSatellite === SatelliteType.sentinels2l1c) {
+                    let found = false;
+                    for (const [key, value] of Object.entries(uploadStore.sentinels2cAssignment)) {
+                        if (value === currentUploadFileName) {
+                            await loadBandByFile(key.replace('Band ', 'B').toUpperCase(), uploadStore.uploadedFiles[i]);
+                            found = true;
+                        }
+                    }
+                    if (!found && isLayerFile(currentUploadFileName)) {
+                        otherLayers.push(uploadStore.uploadedFiles[i].name);
                     }
                 }
             }
@@ -538,23 +571,6 @@ async function loadEditor() {
         await loadBandByUrl('B12');
     }
 
-
-
-    // await Promise.all([
-    //     loadBandByUrl('B1'),
-    //     loadBandByUrl('B2'),
-    //     loadBandByUrl('B3'),
-    //     loadBandByUrl('B4'),
-    //     loadBandByUrl('B5'),
-    //     loadBandByUrl('B6'),
-    //     loadBandByUrl('B7'),
-    //     loadBandByUrl('B8'),
-    //     loadBandByUrl('B8A'),
-    //     loadBandByUrl('B9'),
-    //     loadBandByUrl('B11'),
-    //     loadBandByUrl('B12')
-    // ]);
-
     if (editorStore.referenceGeoTiff) {
         getCornerCoordinates(editorStore.referenceGeoTiff).then((corners) => {
             if (corners.length === 4) {
@@ -575,6 +591,10 @@ async function loadEditor() {
             w = Math.sqrt(editorStore.sentinels2l2a.rawBands.b4.raster.length);
             h = Math.sqrt(editorStore.sentinels2l2a.rawBands.b4.raster.length);
             break;
+        case SatelliteType.sentinels2l1c:
+            w = Math.sqrt(editorStore.sentinels2l1c.rawBands.b4.raster.length);
+            h = Math.sqrt(editorStore.sentinels2l1c.rawBands.b4.raster.length);
+            break;
         case SatelliteType.landsat8toa:
             w = Math.sqrt(editorStore.landsat8toa.rawBands.b4.raster.length);
             h = Math.sqrt(editorStore.landsat8toa.rawBands.b4.raster.length);
@@ -586,6 +606,36 @@ async function loadEditor() {
 
     let sourceCanvas = editorStore.displaySourceImage(w, h, uploadStore.selectedSatellite);
     editorStore.addLayer('Source Image', sourceCanvas);
+
+
+    otherLayers.forEach(otherLayer => {
+
+        try {
+            let found = editorStore.optionalLayers.find(layer => layer.name === otherLayer);
+            if (found) {
+                if (found.isLayer === false) {
+                    editorStore.addLegend(found, uploadStore.uploadedFiles.find(file => {
+                        let a = file.webkitRelativePath.split('/')[1] === currentFolderName && file.name === otherLayer;
+                        return a;
+                    })!);
+                } else {
+                    editorStore.addImageLayer(otherLayer, w, h, uploadStore.uploadedFiles.find(file => { return file.webkitRelativePath.split('/')[1] === currentFolderName && file.name === otherLayer })!);
+                }
+            }
+
+        } catch (error: any) {
+            console.error(error);
+        }
+    })
+
+    // uploadStore.uploadedFiles.forEach((file: File) => {
+    //     try {
+    //         editorStore.addImageLayer(file.name, w, h, file);
+    //     } catch (e) {
+    //         console.error(e);
+    //     }
+    // })
+
     editorStore.addDrawingLayer('Drawing Layer 1', w, h);
     editorStore.selectLayer('Drawing Layer 1');
 

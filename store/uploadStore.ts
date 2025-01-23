@@ -46,6 +46,21 @@ export const useUploadStore = defineStore<'uploadStore', UploadStore, UploadStor
             'Band 11': '',
             'Band 12': ''
         } as Record<string, string>,
+        sentinels2cAssignment: {
+            'Band 1': '',
+            'Band 2': '',
+            'Band 3': '',
+            'Band 4': '',
+            'Band 5': '',
+            'Band 6': '',
+            'Band 7': '',
+            'Band 8': '',
+            'Band 8a': '',
+            'Band 9': '',
+            'Band 10': '',
+            'Band 11': '',
+            'Band 12': ''
+        } as Record<string, string>,
         landsat8toaAssignment: {
             'Band 1': '',
             'Band 2': '',

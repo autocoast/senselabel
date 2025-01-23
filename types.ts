@@ -28,6 +28,12 @@ export interface EditorStore {
     }
     drawingLayers: { title: string, selected: boolean }[];
     otherLayers: { title: string, selected: boolean }[];
+    optionalLayers: {
+        name: string;
+        isLayer: boolean;
+        displayAlways: boolean;
+        legendToLayer: string;
+    }[],
     plainDrawer: {
         drawLayer: string;
         active: boolean;
@@ -67,7 +73,10 @@ export interface EditorStore {
         discreteActive: boolean,
         discreteMenuOpen: boolean,
         kmeansMenuOpen: boolean,
-        kmeansClustered: boolean
+        kmeansClustered: boolean,
+        isLayer: boolean,
+        legendDisplayAlways: boolean,
+        legendForLayer: string
     }>;
     width: number;
     height: number;
@@ -201,6 +210,13 @@ export interface EditorStoreGetters {
 export interface EditorStoreActions {
     displaySourceImage(width: number, height: number, satelliteType: SatelliteType): HTMLCanvasElement;
     addLayer(layerName: string, canvas: HTMLCanvasElement, discretizable?: boolean): void;
+    addImageLayer(layerName: string, width: number, height: number, imageUrl: File): void;
+    addLegend(layerName: {
+        name: string;
+        isLayer: boolean;
+        displayAlways: boolean;
+        legendToLayer: string;
+    }, file: File): void;
     toggleNormalization(satelliteType: SatelliteType): void;
     addDrawingLayer(layerName: string, width: number, height: number): void;
     activateTool(tool: string): void;

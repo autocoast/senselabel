@@ -26,7 +26,10 @@
             <div class="card-body">
                 <div class="flex justify-center mt-4">
                     <div class="min-w-44">
-                        <Button @click="startLabelling()">Start Labeling</Button>
+                        <Button @click="() => {
+                            editorStore.optionalLayers = _.cloneDeep(otherLayers);
+                            startLabelling();
+                        }">Start Labeling</Button>
                     </div>
                 </div>
                 <ul class="steps mt-7">
@@ -79,7 +82,26 @@
                     <div class="space-y-4">
                         <div v-for="(layer, index) in otherLayers" :key="index"
                             class="flex items-center gap-4 p-4 bg-base-100 rounded-lg shadow-md dark:bg-slate-900 dark:text-coolgreen">
-                            <p>{{ layer }}</p>
+                            <p>{{ layer.name }}</p>
+                            <select @change="(e) => {
+                                // @ts-ignore
+                                if (e.target.value === 'legend') {
+                                    layer.isLayer = false;
+                                    // @ts-ignore
+                                } else if (e.target.value === 'layer') {
+                                    layer.isLayer = true;
+                                }
+                            }">
+                                <option value="layer">Layer</option>
+                                <option value="legend">Legend</option>
+                            </select>
+                            <select @change="(e) => {
+                                // @ts-ignore
+                                layer.legendToLayer = e.target.value;
+                            }" v-if="layer.isLayer === false">
+                                <option value="displayAlways">Display always</option>
+                                <option v-for="l in otherLayers">{{ l.name }}</option>
+                            </select>
                         </div>
                     </div>
                     <div class="m-5"></div>
@@ -112,16 +134,24 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useEditorStore } from '~/store/editorStore';
 import { useUploadStore } from '~/store/uploadStore';
 import { SatelliteType } from '~/types';
+import _ from 'lodash';
 
 // Reactive array to store classes
 
 const uploadStore = useUploadStore();
 const router = useRouter();
+const editorStore = useEditorStore();
 
 const rgbLayerName = ref<string>('RGB');
-const otherLayers: Ref<string[]> = ref([]);
+const otherLayers: Ref<{
+    name: string;
+    isLayer: boolean;
+    displayAlways: boolean;
+    legendToLayer: string;
+}[]> = ref([]);
 
 
 function startLabelling() {
@@ -139,8 +169,6 @@ function getOtherLayers() {
             }
         }
 
-        // console.log(uploadStore.uploadedFiles[i].webkitRelativePath.split('/'));
-
         let fileName = uploadStore.uploadedFiles[i].webkitRelativePath.split('/')[2];
 
         if (uploadStore.selectedSatellite === SatelliteType.sentinels2l2a) {
@@ -155,7 +183,52 @@ function getOtherLayers() {
             }
 
             if (fileName.endsWith('.jpg') || fileName.endsWith('.png') || fileName.endsWith('.jpeg') || fileName.endsWith('.tif') || fileName.endsWith('.tiff') || fileName.endsWith('.bmp')) {
-                otherLayers.value.push(fileName);
+                otherLayers.value.push({
+                    name: fileName,
+                    isLayer: true,
+                    displayAlways: false,
+                    legendToLayer: ''
+                });
+            }
+
+        } else if (uploadStore.selectedSatellite === SatelliteType.sentinels2l1c) {
+            let found = false;
+            for (const [key, value] of Object.entries(uploadStore.sentinels2cAssignment)) {
+                if (value === fileName) {
+                    found = true;
+                }
+            }
+            if (found) {
+                continue;
+            }
+
+            if (fileName.endsWith('.jpg') || fileName.endsWith('.png') || fileName.endsWith('.jpeg') || fileName.endsWith('.tif') || fileName.endsWith('.tiff') || fileName.endsWith('.bmp')) {
+                otherLayers.value.push({
+                    name: fileName,
+                    isLayer: true,
+                    displayAlways: false,
+                    legendToLayer: ''
+                });
+            }
+
+        } else if (uploadStore.selectedSatellite === SatelliteType.landsat8toa) {
+            let found = false;
+            for (const [key, value] of Object.entries(uploadStore.landsat8toaAssignment)) {
+                if (value === fileName) {
+                    found = true;
+                }
+            }
+            if (found) {
+                continue;
+            }
+
+            if (fileName.endsWith('.jpg') || fileName.endsWith('.png') || fileName.endsWith('.jpeg') || fileName.endsWith('.tif') || fileName.endsWith('.tiff') || fileName.endsWith('.bmp')) {
+                otherLayers.value.push({
+                    name: fileName,
+                    isLayer: true,
+                    displayAlways: false,
+                    legendToLayer: ''
+                });
             }
 
         }

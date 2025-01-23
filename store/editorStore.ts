@@ -23,6 +23,7 @@ import { normalize } from "~/utils/canvasHandlers/normalizeHandler";
 import { CursorShadowHandler } from "~/utils/canvasHandlers/cursorShadowHandler";
 import { toggleCursor } from "~/utils";
 import GeoTIFF from "geotiff";
+import Panzoom from "@panzoom/panzoom";
 
 export const normalizations: NormType[] = [
     NormType["1and99percentile"],
@@ -65,6 +66,7 @@ export const useEditorStore = defineStore<'editorStore', EditorStore, EditorStor
         otherLayers: [
             // { title: 'Source Image', selected: false },
         ],
+        optionalLayers: [],
         plainDrawer: {
             drawLayer: 'Drawing Layer 1',
             active: false
@@ -105,7 +107,10 @@ export const useEditorStore = defineStore<'editorStore', EditorStore, EditorStor
             discreteActive: boolean,
             discreteMenuOpen: boolean,
             kmeansMenuOpen: boolean,
-            kmeansClustered: boolean
+            kmeansClustered: boolean,
+            isLayer: boolean,
+            legendDisplayAlways: boolean,
+            legendForLayer: string
         }>,
         selectedClass: 0,
         hoverColor: '#000000',
@@ -259,7 +264,7 @@ export const useEditorStore = defineStore<'editorStore', EditorStore, EditorStor
         },
         addLayer(layerName: string, canvas: HTMLCanvasElement, discretizable: boolean = false) {
             this.layerNameToCanvas.set(layerName, canvas);
-            this.layerNameDrawerSettings.set(layerName, { opacity: 100, visible: true, discretizable, discreteActive: false, discreteMenuOpen: false, kmeansMenuOpen: false, kmeansClustered: false });
+            this.layerNameDrawerSettings.set(layerName, { opacity: 100, visible: true, discretizable, discreteActive: false, discreteMenuOpen: false, kmeansMenuOpen: false, kmeansClustered: false, isLayer: true, legendDisplayAlways: false, legendForLayer: '' });
             if (layerName.startsWith('Drawing Layer')) {
                 this.drawingLayerNameDisplayOrder.push(layerName);
                 // this.drawingLayers.forEach(layer => {
@@ -292,6 +297,19 @@ export const useEditorStore = defineStore<'editorStore', EditorStore, EditorStor
                 this.otherLayers.forEach(layer => {
                     layer.selected = layer.title === layerName;
                 });
+                if (document) {
+                    document.querySelectorAll('[id^="legend___"]').forEach((element) => {
+                        (element as HTMLElement).style.display = 'none';
+                    });
+                    this.optionalLayers.forEach((legend) => {
+                        if (legend.isLayer === false && legend.legendToLayer === layerName) {
+                            let legendElement = document.getElementById('legend___' + legend.name);
+                            if (legendElement) {
+                                legendElement.style.display = 'block';
+                            }
+                        }
+                    })
+                }
             }
 
             LayersHandler.getInstance().orderLayers(layerName);
@@ -315,6 +333,9 @@ export const useEditorStore = defineStore<'editorStore', EditorStore, EditorStor
                     case SatelliteType.sentinels2l2a:
                         ctx.putImageData(normalizeBy1And99Percentile([this.sentinels2l2a.rawBands.b4.raster, this.sentinels2l2a.rawBands.b3.raster, this.sentinels2l2a.rawBands.b2.raster], width, height), 0, 0);
                         break;
+                    case SatelliteType.sentinels2l1c:
+                        ctx.putImageData(normalizeBy1And99Percentile([this.sentinels2l2a.rawBands.b4.raster, this.sentinels2l2a.rawBands.b3.raster, this.sentinels2l2a.rawBands.b2.raster], width, height), 0, 0);
+                        break;
                     case SatelliteType.landsat8toa:
                         ctx.putImageData(normalizeBy1And99Percentile([this.landsat8toa.rawBands.b4.raster, this.landsat8toa.rawBands.b3.raster, this.landsat8toa.rawBands.b2.raster], width, height), 0, 0);
                         break
@@ -322,6 +343,81 @@ export const useEditorStore = defineStore<'editorStore', EditorStore, EditorStor
                 ctx!.imageSmoothingEnabled = false;
             }
             return sourceImageCanvas;
+        },
+        addLegend(legend: {
+            name: string;
+            isLayer: boolean;
+            displayAlways: boolean;
+            legendToLayer: string;
+        }, file: File) {
+            const labelContainer = document.getElementById('classicViewContainer');
+            if (!labelContainer) {
+                console.error('Element with ID "labelContainer" not found.');
+                return;
+            }
+
+            const legendCanvas = document.createElement('canvas');
+            // legendCanvas.width = 200; // Set appropriate width
+            // legendCanvas.height = 100; // Set appropriate height
+            legendCanvas.style.position = 'absolute';
+            legendCanvas.style.top = '0';
+            legendCanvas.style.right = '0';
+            legendCanvas.width = 200;
+            legendCanvas.height = 200;
+            if (legend.displayAlways) {
+                legendCanvas.id = 'permanent_legend___' + legend.name;
+            } else {
+                console.log('aaaa');
+                legendCanvas.id = 'legend___' + legend.name;
+                legendCanvas.style.display = 'none';
+            }
+
+            const ctx = legendCanvas.getContext('2d');
+            if (!ctx) {
+                console.error('Failed to get 2D context.');
+                return;
+            }
+
+            const img = new Image();
+            img.onload = () => {
+
+                let ratio = img.width / img.height;
+                legendCanvas.width = Math.min(img.width, 200);
+                legendCanvas.height = Math.floor(legendCanvas.width / ratio);
+                console.log(legendCanvas.width, legendCanvas.height);
+                ctx.drawImage(img, 0, 0, legendCanvas.width, legendCanvas.height);
+                URL.revokeObjectURL(img.src);
+
+            };
+
+            labelContainer.appendChild(legendCanvas);
+
+            let pz = Panzoom(legendCanvas);
+
+            img.src = URL.createObjectURL(file);
+
+
+
+
+        },
+        addImageLayer(layerName: string, width: number, height: number, imageFile: File) {
+            let imageLayerCanvas = document.createElement('canvas');
+            imageLayerCanvas.width = width;
+            imageLayerCanvas.height = height;
+            imageLayerCanvas.style.position = 'absolute';
+            imageLayerCanvas.style.top = '0';
+            imageLayerCanvas.style.left = '0';
+            imageLayerCanvas.style.imageRendering = 'pixelated';
+            imageLayerCanvas.id = layerName;
+            document.getElementById('layers')!.appendChild(imageLayerCanvas);
+            let ctx = imageLayerCanvas.getContext('2d');
+            let img = new Image();
+            img.src = URL.createObjectURL(imageFile);
+            img.onload = () => {
+                ctx!.drawImage(img, 0, 0);
+                document.getElementById('layers')!.appendChild(imageLayerCanvas);
+                this.addLayer(layerName, imageLayerCanvas);
+            };
         },
         addDrawingLayer(layerName: string, width: number, height: number) {
             let drawingCanvas = document.createElement('canvas');
@@ -399,7 +495,10 @@ export const useEditorStore = defineStore<'editorStore', EditorStore, EditorStor
                 discreteActive: boolean,
                 discreteMenuOpen: boolean,
                 kmeansMenuOpen: false,
-                kmeansClustered: false
+                kmeansClustered: false,
+                isLayer: true,
+                legendDisplayAlways: false,
+                legendForLayer: ''
             }>();
         },
         reactivateTool() {

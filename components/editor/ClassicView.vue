@@ -20,7 +20,8 @@
 -->
 
 <template>
-    <div style="position: relative;" oncontextmenu="return false;" class="relative w-full h-full">
+    <div style="position: relative;" oncontextmenu="return false;" class="relative w-full h-full"
+        id="classicViewContainer">
         <EditorClasses />
         <EditorBucketSlider />
         <EditorMap />
