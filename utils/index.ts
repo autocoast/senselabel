@@ -377,7 +377,7 @@ export function downloadAsNpy(ndarray: ndarray.NdArray<Uint8Array>, filename = '
 
 
 // Example usage:
-export function handleDownload(canvases: HTMLCanvasElement[], uploadStore: (UploadStore & UploadStoreActions & UploadStoreGetters)) {
+export function handleDownload(canvases: HTMLCanvasElement[], uploadStore: (UploadStore & UploadStoreActions & UploadStoreGetters), filename: string) {
 
     if (canvases.length === 0) {
         console.error('No canvases found!');
@@ -386,7 +386,7 @@ export function handleDownload(canvases: HTMLCanvasElement[], uploadStore: (Uplo
 
     try {
         const multiChannelArray = createMultiChannelArray(canvases, uploadStore);
-        downloadAsNpy(multiChannelArray);
+        downloadAsNpy(multiChannelArray, filename = filename + '.npy');
     } catch (error) {
         if (error instanceof Error) {
             console.error('Error:', error.message);

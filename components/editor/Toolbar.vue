@@ -140,6 +140,7 @@
 
 import { fromUrl, fromUrls, fromArrayBuffer, fromBlob, GeoTIFF, type TypedArray, GeoTIFFImage, type ReadRasterResult } from 'geotiff';
 import { normalizations, useEditorStore } from '~/store/editorStore';
+import { useNavStore } from '~/store/navStore';
 import { useSettingsStore } from '~/store/settingStore';
 import { useUploadStore } from '~/store/uploadStore';
 import { SatelliteType } from '~/types';
@@ -147,6 +148,7 @@ import { CursorShadowHandler } from '~/utils/canvasHandlers/cursorShadowHandler'
 import { normalize } from '~/utils/canvasHandlers/normalizeHandler';
 const editorStore = useEditorStore();
 const uploadStore = useUploadStore();
+const navStore = useNavStore();
 const settingStore = useSettingsStore();
 
 function hotkeyNameToShortcutName(hotkeyName: string) {
@@ -169,7 +171,7 @@ function downloadNpy() {
     // check if canvas id starts with "Drawing Layer"
     const drawingCanvases = Array.from(canvases).filter(canvas => canvas.id.startsWith('Drawing Layer'));
     // createMultiChannelArray(drawingCanvases, uploadStore);
-    handleDownload(drawingCanvases, uploadStore);
+    handleDownload(drawingCanvases, uploadStore, navStore.links[navStore.currentLinkIndex]);
 }
 
 </script>
