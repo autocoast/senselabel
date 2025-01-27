@@ -58,3 +58,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ### Fixed
 - Npy download file name
 
+---
+
+## [1.0.3] - 2025-01-27
+### Fixed
+- Sentinel L1C preset
