@@ -145,81 +145,23 @@ async function loadTifByUrlAndStore(tifName: string, bandName: string) {
 
 
     if (uploadStore.selectedSatellite === SatelliteType.sentinels2l2a) {
-        switch (bandName) {
-            case 'B1':
-                editorStore.sentinels2l2a.rawBands.b1.raster = rasterImage[0] as Uint16Array;
-                break;
-            case 'B2':
-                editorStore.sentinels2l2a.rawBands.b2.raster = rasterImage[0] as Uint16Array;
-                break;
-            case 'B3':
-                editorStore.sentinels2l2a.rawBands.b3.raster = rasterImage[0] as Uint16Array;
-                editorStore.referenceGeoTiff = tifImage;
-                break;
-            case 'B4':
-                editorStore.sentinels2l2a.rawBands.b4.raster = rasterImage[0] as Uint16Array;
-                break;
-            case 'B5':
-                editorStore.sentinels2l2a.rawBands.b5.raster = rasterImage[0] as Uint16Array;
-                break;
-            case 'B6':
-                editorStore.sentinels2l2a.rawBands.b6.raster = rasterImage[0] as Uint16Array;
-                break;
-            case 'B7':
-                editorStore.sentinels2l2a.rawBands.b7.raster = rasterImage[0] as Uint16Array;
-                break;
-            case 'B8':
-                editorStore.sentinels2l2a.rawBands.b8.raster = rasterImage[0] as Uint16Array;
-                break;
-            case 'B8A':
-                editorStore.sentinels2l2a.rawBands.b8a.raster = rasterImage[0] as Uint16Array;
-                break;
-            case 'B9':
-                editorStore.sentinels2l2a.rawBands.b9.raster = rasterImage[0] as Uint16Array;
-                break;
-            case 'B11':
-                editorStore.sentinels2l2a.rawBands.b11.raster = rasterImage[0] as Uint16Array;
-                break;
-            case 'B12':
-                editorStore.sentinels2l2a.rawBands.b12.raster = rasterImage[0] as Uint16Array;
-                break;
+        //@ts-ignore
+        editorStore.sentinels2l2a.rawBands[bandName.toLowerCase()].raster = rasterImage[0] as Uint16Array;
+        if (bandName === 'B2') {
+            editorStore.referenceGeoTiff = tifImage;
+        }
+
+    } else if (uploadStore.selectedSatellite === SatelliteType.sentinels2l1c) {
+        //@ts-ignore
+        editorStore.sentinels2l1c.rawBands[bandName.toLowerCase()].raster = rasterImage[0] as Uint16Array;
+        if (bandName === 'B2') {
+            editorStore.referenceGeoTiff = tifImage;
         }
     } else if (uploadStore.selectedSatellite === SatelliteType.landsat8toa) {
-        switch (bandName) {
-            case 'B1':
-                editorStore.landsat8toa.rawBands.b1.raster = rasterImage[0] as Uint16Array;
-                break;
-            case 'B2':
-                editorStore.landsat8toa.rawBands.b2.raster = rasterImage[0] as Uint16Array;
-                break;
-            case 'B3':
-                editorStore.landsat8toa.rawBands.b3.raster = rasterImage[0] as Uint16Array;
-                editorStore.referenceGeoTiff = tifImage;
-                break;
-            case 'B4':
-                editorStore.landsat8toa.rawBands.b4.raster = rasterImage[0] as Uint16Array;
-                break;
-            case 'B5':
-                editorStore.landsat8toa.rawBands.b5.raster = rasterImage[0] as Uint16Array;
-                break;
-            case 'B6':
-                editorStore.landsat8toa.rawBands.b6.raster = rasterImage[0] as Uint16Array;
-                break;
-            case 'B7':
-                editorStore.landsat8toa.rawBands.b7.raster = rasterImage[0] as Uint16Array;
-                break;
-            case 'B8':
-                editorStore.landsat8toa.rawBands.b8.raster = rasterImage[0] as Uint16Array;
-                break;
-            case 'B9':
-                editorStore.landsat8toa.rawBands.b9.raster = rasterImage[0] as Uint16Array;
-                break;
-            case 'B10':
-                editorStore.landsat8toa.rawBands.b10.raster = rasterImage[0] as Uint16Array;
-                break;
-            case 'B11':
-                editorStore.landsat8toa.rawBands.b11.raster = rasterImage[0] as Uint16Array;
-                break;
+        //@ts-ignore
+        editorStore.landsat8toa.rawBands[bandName.toLowerCase()].raster = rasterImage[0] as Uint16Array;
+        if (bandName === 'B3') {
+            editorStore.referenceGeoTiff = tifImage;
         }
     }
 }
@@ -230,83 +172,23 @@ async function loadTifByFileAndStore(tif: File, bandName: string) {
     const rasterImage: ReadRasterResult = await image.readRasters()
 
     if (uploadStore.selectedSatellite === SatelliteType.sentinels2l2a) {
-        switch (bandName) {
-            case 'B1':
-                editorStore.sentinels2l2a.rawBands.b1.raster = rasterImage[0] as Uint16Array;
-                break;
-            case 'B2':
-                editorStore.sentinels2l2a.rawBands.b2.raster = rasterImage[0] as Uint16Array;
-                break;
-            case 'B3':
-                editorStore.sentinels2l2a.rawBands.b3.raster = rasterImage[0] as Uint16Array;
-                editorStore.referenceGeoTiff = tifImage;
-                break;
-            case 'B4':
-                editorStore.sentinels2l2a.rawBands.b4.raster = rasterImage[0] as Uint16Array;
-                break;
-            case 'B5':
-                editorStore.sentinels2l2a.rawBands.b5.raster = rasterImage[0] as Uint16Array;
-                break;
-            case 'B6':
-                editorStore.sentinels2l2a.rawBands.b6.raster = rasterImage[0] as Uint16Array;
-                break;
-            case 'B7':
-                editorStore.sentinels2l2a.rawBands.b7.raster = rasterImage[0] as Uint16Array;
-                break;
-            case 'B8':
-                editorStore.sentinels2l2a.rawBands.b8.raster = rasterImage[0] as Uint16Array;
-                break;
-            case 'B8A':
-                editorStore.sentinels2l2a.rawBands.b8a.raster = rasterImage[0] as Uint16Array;
-                break;
-            case 'B9':
-                editorStore.sentinels2l2a.rawBands.b9.raster = rasterImage[0] as Uint16Array;
-                break;
-            case 'B11':
-                editorStore.sentinels2l2a.rawBands
-                    .b11.raster = rasterImage[0] as Uint16Array;
-                break;
-            case 'B12':
-                editorStore.sentinels2l2a.rawBands
-                    .b12.raster = rasterImage[0] as Uint16Array;
-                break;
+        //@ts-ignore
+        editorStore.sentinels2l2a.rawBands[bandName.toLowerCase()].raster = rasterImage[0] as Uint16Array;
+        if (bandName === 'B2') {
+            editorStore.referenceGeoTiff = tifImage;
+        }
+
+    } else if (uploadStore.selectedSatellite === SatelliteType.sentinels2l1c) {
+        //@ts-ignore
+        editorStore.sentinels2l1c.rawBands[bandName.toLowerCase()].raster = rasterImage[0] as Uint16Array;
+        if (bandName === 'B2') {
+            editorStore.referenceGeoTiff = tifImage;
         }
     } else if (uploadStore.selectedSatellite === SatelliteType.landsat8toa) {
-        switch (bandName) {
-            case 'B1':
-                editorStore.landsat8toa.rawBands.b1.raster = rasterImage[0] as Uint16Array;
-                break;
-            case 'B2':
-                editorStore.landsat8toa.rawBands.b2.raster = rasterImage[0] as Uint16Array;
-                break;
-            case 'B3':
-                editorStore.landsat8toa.rawBands.b3.raster = rasterImage[0] as Uint16Array;
-                editorStore.referenceGeoTiff = tifImage;
-                break;
-            case 'B4':
-                editorStore.landsat8toa.rawBands.b4.raster = rasterImage[0] as Uint16Array;
-                break;
-            case 'B5':
-                editorStore.landsat8toa.rawBands.b5.raster = rasterImage[0] as Uint16Array;
-                break;
-            case 'B6':
-                editorStore.landsat8toa.rawBands.b6.raster = rasterImage[0] as Uint16Array;
-                break;
-            case 'B7':
-                editorStore.landsat8toa.rawBands.b7.raster = rasterImage[0] as Uint16Array;
-                break;
-            case 'B8':
-                editorStore.landsat8toa.rawBands.b8.raster = rasterImage[0] as Uint16Array;
-                break;
-            case 'B9':
-                editorStore.landsat8toa.rawBands.b9.raster = rasterImage[0] as Uint16Array;
-                break;
-            case 'B10':
-                editorStore.landsat8toa.rawBands.b10.raster = rasterImage[0] as Uint16Array;
-                break;
-            case 'B11':
-                editorStore.landsat8toa.rawBands.b11.raster = rasterImage[0] as Uint16Array;
-                break;
+        //@ts-ignore
+        editorStore.landsat8toa.rawBands[bandName.toLowerCase()].raster = rasterImage[0] as Uint16Array;
+        if (bandName === 'B3') {
+            editorStore.referenceGeoTiff = tifImage;
         }
     }
 }
@@ -355,6 +237,52 @@ async function loadBandByFile(bandName: string, uploadFile: File) {
             case 'B13':
                 break;
         }
+    } else if (uploadStore.selectedSatellite === SatelliteType.sentinels2l1c) {
+        switch (bandName) {
+            case 'B1':
+                await loadTifByFileAndStore(uploadFile, 'B1')
+                break;
+            case 'B2':
+                await loadTifByFileAndStore(uploadFile, 'B2')
+                break;
+            case 'B3':
+                await loadTifByFileAndStore(uploadFile, 'B3')
+                break;
+            case 'B4':
+                await loadTifByFileAndStore(uploadFile, 'B4')
+                break;
+            case 'B5':
+                await loadTifByFileAndStore(uploadFile, 'B5')
+                break;
+            case 'B6':
+                await loadTifByFileAndStore(uploadFile, 'B6')
+                break;
+            case 'B7':
+                await loadTifByFileAndStore(uploadFile, 'B7')
+                break;
+            case 'B8':
+                await loadTifByFileAndStore(uploadFile, 'B8')
+                break;
+            case 'B8A':
+                await loadTifByFileAndStore(uploadFile, 'B8A')
+                break;
+            case 'B9':
+                await loadTifByFileAndStore(uploadFile, 'B9')
+                break;
+            case 'B10':
+                await loadTifByFileAndStore(uploadFile, 'B10')
+                break;
+                break;
+            case 'B11':
+                await loadTifByFileAndStore(uploadFile, 'B11')
+                break;
+            case 'B12':
+                await loadTifByFileAndStore(uploadFile, 'B12')
+                break;
+            case 'B13':
+                break;
+        }
+
     } else if (uploadStore.selectedSatellite === SatelliteType.landsat8toa) {
         switch (bandName) {
             case 'B1':
@@ -486,8 +414,12 @@ watch(() => navStore.currentLinkIndex, () => {
 async function loadEditor() {
 
     if (document) {
-        document.querySelector('[id^="permanent_legend___"]')?.remove();
-        document.querySelector('[id^="legend___"]')?.remove();
+        document.querySelectorAll('[id^="permanent_legend"]')?.forEach((element) => {
+            element.remove();
+        });
+        document.querySelectorAll('[id^="legend___"]')?.forEach((element) => {
+            element.remove();
+        });
     }
 
     await settingStore.loadSettings();
@@ -650,6 +582,17 @@ async function loadEditor() {
             }
             if (uploadStore.useNdwi) {
                 loadNDWI(editorStore, SatelliteType.sentinels2l2a);
+            }
+            break;
+        case SatelliteType.sentinels2l1c:
+            if (uploadStore.useNdvi) {
+                loadNDVI(editorStore, SatelliteType.sentinels2l1c);
+            }
+            if (uploadStore.useAgriculture) {
+                loadAgriculture(editorStore, SatelliteType.sentinels2l1c);
+            }
+            if (uploadStore.useNdwi) {
+                loadNDWI(editorStore, SatelliteType.sentinels2l1c);
             }
             break;
         case SatelliteType.landsat8toa:

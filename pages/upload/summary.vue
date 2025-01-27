@@ -87,6 +87,7 @@
                                 // @ts-ignore
                                 if (e.target.value === 'legend') {
                                     layer.isLayer = false;
+                                    layer.displayAlways = true;
                                     // @ts-ignore
                                 } else if (e.target.value === 'layer') {
                                     layer.isLayer = true;

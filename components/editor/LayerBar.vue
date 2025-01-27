@@ -113,6 +113,8 @@ function discreteToContinuos(layerName: string) {
                     loadNDVI(editorStore, SatelliteType.sentinels2l2a);
                 case SatelliteType.landsat8toa:
                     loadNDVI(editorStore, SatelliteType.landsat8toa);
+                case SatelliteType.sentinels2l1c:
+                    loadNDVI(editorStore, SatelliteType.sentinels2l1c);
             }
             break;
         case 'Agriculture':
@@ -121,6 +123,9 @@ function discreteToContinuos(layerName: string) {
                     loadAgriculture(editorStore, SatelliteType.sentinels2l2a);
                 case SatelliteType.landsat8toa:
                     loadAgriculture(editorStore, SatelliteType.landsat8toa);
+                case SatelliteType.sentinels2l1c:
+                    loadAgriculture(editorStore, SatelliteType.sentinels2l1c);
+                    break;
             }
             break;
         case 'NDWI':
@@ -129,6 +134,9 @@ function discreteToContinuos(layerName: string) {
                     loadNDWI(editorStore, SatelliteType.sentinels2l2a);
                 case SatelliteType.landsat8toa:
                     loadNDWI(editorStore, SatelliteType.landsat8toa);
+                case SatelliteType.sentinels2l1c:
+                    loadNDWI(editorStore, SatelliteType.sentinels2l1c);
+                    break;
             }
             break;
     }

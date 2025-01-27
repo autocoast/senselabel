@@ -64,8 +64,7 @@
                         settings will be saved for future uploads, provided the file structure remains unchanged. {{
                             uploadStore.multipleFilesUpload ? 'We assume that every folder has the same structure.' : '' }}
                     </p>
-                    <div v-if="uploadStore.selectedSatellite === SatelliteType.sentinels2l1c || uploadStore.selectedSatellite === SatelliteType.sentinels2l2a"
-                        class="flex flex-col">
+                    <div v-if="uploadStore.selectedSatellite === SatelliteType.sentinels2l2a" class="flex flex-col">
                         <div class="flex items-center mb-4  bg-slate-50 rounded-xl p-3 dark:bg-slate-900"
                             v-for="band in bands">
                             <div class="w-10/12">
@@ -75,6 +74,24 @@
                             <div class="form-control w-full mb-0">
                                 <select @change="() => {
                                 }" v-model="uploadStore.sentinels2aAssignment[band.name]"
+                                    class="select select-bordered select-primary dark:bg-transparent dark:text-coolgreen dark:border-coolgreen bg-primary text-white">
+                                    <option :value="file.name" v-for="file in selectableTifFiles">
+                                        {{ file.name }}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div v-if="uploadStore.selectedSatellite === SatelliteType.sentinels2l1c" class="flex flex-col">
+                        <div class="flex items-center mb-4  bg-slate-50 rounded-xl p-3 dark:bg-slate-900"
+                            v-for="band in bands">
+                            <div class="w-10/12">
+                                <p class="text-primary">{{ band.name }}</p>
+                                <p class="text-gray-300">{{ band.description }}, {{ band.centralWaveLength }}nm</p>
+                            </div>
+                            <div class="form-control w-full mb-0">
+                                <select @change="() => {
+                                }" v-model="uploadStore.sentinels2cAssignment[band.name]"
                                     class="select select-bordered select-primary dark:bg-transparent dark:text-coolgreen dark:border-coolgreen bg-primary text-white">
                                     <option :value="file.name" v-for="file in selectableTifFiles">
                                         {{ file.name }}
@@ -198,6 +215,22 @@ function probablyHasBandName(bandName: string): string {
                     }
                 };
             }
+        } else if (uploadStore.selectedSatellite === SatelliteType.sentinels2l1c) {
+            let s2cPreAssignment = parsedBandAssignments['sentinels2c'];
+            if (!_.isEmpty(s2cPreAssignment)) {
+                for (let band of bands.value) {
+                    if (band.name === bandName) {
+                        for (const [key, value] of Object.entries(s2cPreAssignment)) {
+                            if (band.name === key) {
+                                let foundFn = uploadStore.uploadedFiles.find(x => x.name == value);
+                                if (foundFn) {
+                                    return foundFn.name;
+                                }
+                            }
+                        }
+                    }
+                };
+            }
         }
     }
 
@@ -264,6 +297,39 @@ function probablyHasBandName(bandName: string): string {
             let filename = selectableTifFiles.value[i].name;
             if (regex1.test(filename) || regex2.test(filename)) {
                 uploadStore.sentinels2aAssignment[bandName] = filename;
+                return filename;
+            }
+        }
+
+    } else if (uploadStore.selectedSatellite === SatelliteType.sentinels2l1c) {
+        let bandSplit = bandName.split(' ');  // e.g. Band 1
+        let candidate1 = 'B' + bandSplit[1] + '.tif';
+        let candidate2 = 'B' + bandSplit[1] + '.tiff';
+
+        for (let i = 0; i < selectableTifFiles.value.length; i++) {
+            let filename = selectableTifFiles.value[i].name;
+            if (filename.includes(candidate1) || filename.includes(candidate2)) {
+                uploadStore.sentinels2cAssignment[bandName] = filename;
+                return filename;
+            }
+        }
+
+        for (let i = 0; i < selectableTifFiles.value.length; i++) {
+            let filename = selectableTifFiles.value[i].name;
+            if (filename.includes(bandSplit[1])) {
+                uploadStore.sentinels2cAssignment[bandName] = filename;
+                return filename;
+            }
+        }
+
+        const regex1 = new RegExp(`(^|[^0-9])${bandSplit[1]}([^0-9]|$)`);
+        const regex2 = new RegExp(`(^|[^0-9])0${bandSplit[1]}([^0-9]|$)`);
+        // return regex.test(str);
+
+        for (let i = 0; i < selectableTifFiles.value.length; i++) {
+            let filename = selectableTifFiles.value[i].name;
+            if (regex1.test(filename) || regex2.test(filename)) {
+                uploadStore.sentinels2cAssignment[bandName] = filename;
                 return filename;
             }
         }
@@ -323,6 +389,30 @@ function saveToCache() {
         } else {
             let newAssignment = {
                 'landsat8': _.cloneDeep(uploadStore.landsat8toaAssignment)
+            };
+            localStorage.setItem('bandAssignments', JSON.stringify(newAssignment));
+        }
+    } else if (uploadStore.selectedSatellite === SatelliteType.sentinels2l1c) {
+        if (bandAssignments) {
+            let parsedBandAssignments: Record<string, any> = JSON.parse(bandAssignments);
+
+            if (_.has(parsedBandAssignments, 'sentinels2c')) {
+                let s2cPreAssignment: Record<string, string> = parsedBandAssignments['sentinels2c'];
+
+                s2cPreAssignment = _.cloneDeep(uploadStore.sentinels2cAssignment);
+                parsedBandAssignments['sentinels2c'] = s2cPreAssignment;
+
+                // save
+                localStorage.setItem('bandAssignments', JSON.stringify(parsedBandAssignments));
+            } else {
+                parsedBandAssignments['sentinels2c'] = _.cloneDeep(uploadStore.sentinels2cAssignment);
+                // save
+                localStorage.setItem('bandAssignments', JSON.stringify(parsedBandAssignments));
+            }
+
+        } else {
+            let newAssignment = {
+                'sentinels2c': _.cloneDeep(uploadStore.sentinels2cAssignment)
             };
             localStorage.setItem('bandAssignments', JSON.stringify(newAssignment));
         }

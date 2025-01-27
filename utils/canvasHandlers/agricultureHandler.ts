@@ -57,6 +57,11 @@ export function loadAgriculture(editStore: EditorStore, satelliteType: Satellite
             NIR = editStore.sentinels2l2a.rawBands.b8.raster;
             SWIR = editStore.sentinels2l2a.rawBands.b11.raster;
             break;
+        case SatelliteType.sentinels2l1c:
+            BLUE = editStore.sentinels2l1c.rawBands.b2.raster;
+            NIR = editStore.sentinels2l1c.rawBands.b8.raster;
+            SWIR = editStore.sentinels2l1c.rawBands.b11.raster;
+            break;
         case SatelliteType.landsat8toa:
             BLUE = editStore.landsat8toa.rawBands.b2.raster;
             NIR = editStore.landsat8toa.rawBands.b5.raster;

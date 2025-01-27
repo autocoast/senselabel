@@ -91,7 +91,7 @@ export default {
             'description': 'Visible and Near Infrared (VNIR)'
         },
         {
-            'name': 'Band 8a',
+            'name': 'Band 8A',
             'resolution': 20,
             'centralWaveLength': 865,
             'description': 'Visible and Near Infrared (VNIR)'
@@ -172,7 +172,7 @@ export default {
             'description': 'Visible and Near Infrared (VNIR)'
         },
         {
-            'name': 'Band 8a',
+            'name': 'Band 8A',
             'resolution': 20,
             'centralWaveLength': 865,
             'description': 'Visible and Near Infrared (VNIR)'

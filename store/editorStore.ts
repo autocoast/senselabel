@@ -22,7 +22,7 @@ import { NormType, SatelliteType, type EditorStore, type EditorStoreActions, typ
 import { normalize } from "~/utils/canvasHandlers/normalizeHandler";
 import { CursorShadowHandler } from "~/utils/canvasHandlers/cursorShadowHandler";
 import { toggleCursor } from "~/utils";
-import GeoTIFF from "geotiff";
+import GeoTIFF, { fromArrayBuffer, GeoTIFFImage, type ReadRasterResult, type TypedArray } from "geotiff";
 import Panzoom from "@panzoom/panzoom";
 
 export const normalizations: NormType[] = [
@@ -260,6 +260,9 @@ export const useEditorStore = defineStore<'editorStore', EditorStore, EditorStor
                 case SatelliteType.landsat8toa:
                     normalize(this, this.currentNormalization, SatelliteType.landsat8toa);
                     break
+                case SatelliteType.sentinels2l1c:
+                    normalize(this, this.currentNormalization, SatelliteType.sentinels2l1c);
+                    break
             }
         },
         addLayer(layerName: string, canvas: HTMLCanvasElement, discretizable: boolean = false) {
@@ -334,7 +337,7 @@ export const useEditorStore = defineStore<'editorStore', EditorStore, EditorStor
                         ctx.putImageData(normalizeBy1And99Percentile([this.sentinels2l2a.rawBands.b4.raster, this.sentinels2l2a.rawBands.b3.raster, this.sentinels2l2a.rawBands.b2.raster], width, height), 0, 0);
                         break;
                     case SatelliteType.sentinels2l1c:
-                        ctx.putImageData(normalizeBy1And99Percentile([this.sentinels2l2a.rawBands.b4.raster, this.sentinels2l2a.rawBands.b3.raster, this.sentinels2l2a.rawBands.b2.raster], width, height), 0, 0);
+                        ctx.putImageData(normalizeBy1And99Percentile([this.sentinels2l1c.rawBands.b4.raster, this.sentinels2l1c.rawBands.b3.raster, this.sentinels2l1c.rawBands.b2.raster], width, height), 0, 0);
                         break;
                     case SatelliteType.landsat8toa:
                         ctx.putImageData(normalizeBy1And99Percentile([this.landsat8toa.rawBands.b4.raster, this.landsat8toa.rawBands.b3.raster, this.landsat8toa.rawBands.b2.raster], width, height), 0, 0);
@@ -344,12 +347,15 @@ export const useEditorStore = defineStore<'editorStore', EditorStore, EditorStor
             }
             return sourceImageCanvas;
         },
-        addLegend(legend: {
-            name: string;
-            isLayer: boolean;
-            displayAlways: boolean;
-            legendToLayer: string;
-        }, file: File) {
+        async addLegend(
+            legend: {
+                name: string;
+                isLayer: boolean;
+                displayAlways: boolean;
+                legendToLayer: string;
+            },
+            file: File
+        ) {
             const labelContainer = document.getElementById('classicViewContainer');
             if (!labelContainer) {
                 console.error('Element with ID "labelContainer" not found.');
@@ -357,18 +363,13 @@ export const useEditorStore = defineStore<'editorStore', EditorStore, EditorStor
             }
 
             const legendCanvas = document.createElement('canvas');
-            // legendCanvas.width = 200; // Set appropriate width
-            // legendCanvas.height = 100; // Set appropriate height
             legendCanvas.style.position = 'absolute';
             legendCanvas.style.top = '0';
             legendCanvas.style.right = '0';
             legendCanvas.width = 200;
             legendCanvas.height = 200;
-            if (legend.displayAlways) {
-                legendCanvas.id = 'permanent_legend___' + legend.name;
-            } else {
-                console.log('aaaa');
-                legendCanvas.id = 'legend___' + legend.name;
+            legendCanvas.id = legend.displayAlways ? 'permanent_legend___' + legend.name : 'legend___' + legend.name;
+            if (!legend.displayAlways) {
                 legendCanvas.style.display = 'none';
             }
 
@@ -378,27 +379,51 @@ export const useEditorStore = defineStore<'editorStore', EditorStore, EditorStor
                 return;
             }
 
-            const img = new Image();
-            img.onload = () => {
-
-                let ratio = img.width / img.height;
-                legendCanvas.width = Math.min(img.width, 200);
-                legendCanvas.height = Math.floor(legendCanvas.width / ratio);
-                console.log(legendCanvas.width, legendCanvas.height);
-                ctx.drawImage(img, 0, 0, legendCanvas.width, legendCanvas.height);
-                URL.revokeObjectURL(img.src);
-
-            };
-
             labelContainer.appendChild(legendCanvas);
+            const pz = Panzoom(legendCanvas);
 
-            let pz = Panzoom(legendCanvas);
+            if (file.name.endsWith('.tif') || file.name.endsWith('.tiff')) {
+                try {
+                    const tifImage = await fromArrayBuffer(await file.arrayBuffer());
+                    const image: GeoTIFFImage = await tifImage.getImage();
+                    const rasterImage = await image.readRasters({ interleave: true }); // Get interleaved data for easier RGBA mapping
 
-            img.src = URL.createObjectURL(file);
+                    const width = image.getWidth();
+                    const height = image.getHeight();
 
+                    // Update canvas size to match the GeoTIFF dimensions
+                    legendCanvas.width = Math.min(width, 200);
+                    legendCanvas.height = Math.floor((legendCanvas.width / width) * height);
 
+                    // Create an ImageData object
+                    const imageData = ctx.createImageData(width, height);
 
+                    // Map the raster data to the ImageData object (assume grayscale or single-band data)
+                    for (let i = 0; i < rasterImage.length; i++) {
+                        const pixelValue = Number(rasterImage[i]); // Pixel value from the raster
+                        const mappedValue = (pixelValue / 255) * 255; // Normalize to 0-255
+                        imageData.data[i * 4] = mappedValue; // Red channel
+                        imageData.data[i * 4 + 1] = mappedValue; // Green channel
+                        imageData.data[i * 4 + 2] = mappedValue; // Blue channel
+                        imageData.data[i * 4 + 3] = 255; // Alpha channel
+                    }
 
+                    // Draw the ImageData onto the canvas
+                    ctx.putImageData(imageData, 0, 0);
+                } catch (error) {
+                    console.error('Failed to process GeoTIFF file:', error);
+                }
+            } else {
+                const img = new Image();
+                img.onload = () => {
+                    const ratio = img.width / img.height;
+                    legendCanvas.width = Math.min(img.width, 200);
+                    legendCanvas.height = Math.floor(legendCanvas.width / ratio);
+                    ctx.drawImage(img, 0, 0, legendCanvas.width, legendCanvas.height);
+                    URL.revokeObjectURL(img.src);
+                };
+                img.src = URL.createObjectURL(file);
+            }
         },
         addImageLayer(layerName: string, width: number, height: number, imageFile: File) {
             let imageLayerCanvas = document.createElement('canvas');

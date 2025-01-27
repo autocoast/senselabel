@@ -241,6 +241,7 @@ export interface UploadStore {
     useNdwi: boolean;
     useAgriculture: boolean;
     sentinels2aAssignment: Record<string, string>;
+    sentinels2cAssignment: Record<string, string>;
     landsat8toaAssignment: Record<string, string>;
     classes: {
         id: number,
