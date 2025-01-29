@@ -25,7 +25,7 @@
         <EditorClasses />
         <EditorBucketSlider />
         <EditorMap />
-        <div :class="editorStore.mapIsActive ? 'hidden' : 'display'" id="panContainer" class="w-full h-full">
+        <div :class="editorStore.mapIsActive ? 'hidden' : 'display'" id="panContainer"> <!--class="w-full h-full">-->
             <div id="labelContainer" class="w-full h-full">
                 <div id="layers"></div>
                 <div id="drawingContainer"></div>

@@ -536,6 +536,11 @@ async function loadEditor() {
     editorStore.width = w;
     editorStore.height = h;
 
+    document.getElementById('labelContainer')!.style.width = w + 'px';
+    document.getElementById('labelContainer')!.style.height = h + 'px';
+    document.getElementById('panContainer')!.style.width = w + 'px';
+    document.getElementById('panContainer')!.style.height = h + 'px';
+
     let sourceCanvas = editorStore.displaySourceImage(w, h, uploadStore.selectedSatellite);
     editorStore.addLayer('Source Image', sourceCanvas);
 

@@ -380,7 +380,14 @@ export const useEditorStore = defineStore<'editorStore', EditorStore, EditorStor
             }
 
             labelContainer.appendChild(legendCanvas);
-            const pz = Panzoom(legendCanvas);
+
+            const pz = Panzoom(legendCanvas, {
+                maxScale: 20,
+                minScale: 0.1,
+                bounds: false,
+                boundsPadding: 0
+            });
+            document.getElementById(legendCanvas.id)!.addEventListener('wheel', pz.zoomWithWheel);
 
             if (file.name.endsWith('.tif') || file.name.endsWith('.tiff')) {
                 try {
@@ -390,9 +397,10 @@ export const useEditorStore = defineStore<'editorStore', EditorStore, EditorStor
 
                     const width = image.getWidth();
                     const height = image.getHeight();
+                    console.log('Width:', width, 'Height:', height);
 
                     // Update canvas size to match the GeoTIFF dimensions
-                    legendCanvas.width = Math.min(width, 200);
+                    legendCanvas.width = Math.max(width, 200);
                     legendCanvas.height = Math.floor((legendCanvas.width / width) * height);
 
                     // Create an ImageData object
@@ -416,8 +424,10 @@ export const useEditorStore = defineStore<'editorStore', EditorStore, EditorStor
             } else {
                 const img = new Image();
                 img.onload = () => {
+                    console.log(img.width);
+                    console.log(img.height);
                     const ratio = img.width / img.height;
-                    legendCanvas.width = Math.min(img.width, 200);
+                    legendCanvas.width = Math.max(img.width, 200);
                     legendCanvas.height = Math.floor(legendCanvas.width / ratio);
                     ctx.drawImage(img, 0, 0, legendCanvas.width, legendCanvas.height);
                     URL.revokeObjectURL(img.src);
