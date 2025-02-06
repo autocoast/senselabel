@@ -63,3 +63,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ## [1.0.3] - 2025-01-27
 ### Fixed
 - Sentinel L1C preset
+
+## [1.0.4] - 2024-02-06
+
+### Added
+- Dark/Light mode toggle with persistent theme preference
+- Theme support across all components
+- System theme detection for initial theme
+
+### Changed
+- Updated UI components to support both dark and light themes
+- Improved color scheme consistency
+- Enhanced visual feedback in dark mode
+

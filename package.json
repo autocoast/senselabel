@@ -1,11 +1,11 @@
 {
-  "name": "nuxt-app",
+  "name": "remote-sensing-labelling-tool",
   "private": true,
   "type": "module",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "scripts": {
     "build": "nuxt build",
-    "dev": "nuxt dev",
+    "dev": "nuxt dev --host 0.0.0.0",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare"
