@@ -129,7 +129,11 @@
         <label class="label cursor-pointer">
             <span class="label-text text-xs text-slate-400">Hotkeys</span>
             <input v-model="editorStore.showHotkeys" type="checkbox"
-                class="toggle dark:bg-slate-950 dark:hover:bg-slate-950 dark:border-slate-950 dark:focus:border-slate-950 bg-slate-200 hover:bg-slate-200 border-slate-400 hover:border-slate-400 focus:border-slate-400 input-primary input-bordered toggle-sm" />
+                class="toggle toggle-sm 
+                dark:bg-gray-700 dark:border-gray-700
+                dark:checked:bg-primary dark:checked:border-primary
+                bg-slate-200 
+                checked:bg-primary checked:border-primary" />
         </label>
         <!-- </div> -->
     </div>

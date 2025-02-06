@@ -7,8 +7,8 @@
             <Icon name="mdi:plus" />
         </button>
     </div>
-    <div class="cursor-pointer text-sm text-slate-500 rounded-lg p-2 dark:bg-indigo-950"
-        :class="editorStore.selectedDrawingLayer === layerName ? 'bg-slate-200' : ''"
+    <div class="cursor-pointer text-sm text-slate-500 rounded-lg p-2"
+        :class="editorStore.selectedDrawingLayer === layerName ? 'bg-slate-200 dark:bg-gray-700' : ''"
         @click="editorStore.selectLayer(layerName)" v-for="layerName in editorStore.drawingLayerNameDisplayOrder"
         :key="layerName">
         <div>{{ layerName }}</div>
@@ -27,7 +27,7 @@
     <div class="m-4"></div>
     <span class="text-xs text-slate-400">Other Layers</span>
     <div class="cursor-pointer text-sm text-slate-500 rounded-lg p-2"
-        :class="editorStore.selectedOtherLayer === layerName ? 'bg-slate-200 dark:bg-indigo-950' : ''"
+        :class="editorStore.selectedOtherLayer === layerName ? 'bg-slate-200 dark:bg-gray-700' : ''"
         @click="editorStore.selectLayer(layerName)" v-for="layerName in editorStore.layerNameDisplayOrder"
         :key="layerName">
         <div>{{ layerName }}</div>
