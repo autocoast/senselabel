@@ -2,7 +2,7 @@
   "name": "remote-sensing-labelling-tool",
   "private": true,
   "type": "module",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev --host 0.0.0.0",

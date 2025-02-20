@@ -123,7 +123,8 @@
                     </div>
                     <div class="flex justify-center mt-4">
                         <div class="min-w-44">
-                            <Button @click="startLabelling()">Start Labeling</Button>
+                            <Button @click="      editorStore.optionalLayers = _.cloneDeep(otherLayers);
+                            startLabelling();">Start Labeling</Button>
                         </div>
                     </div>
                 </div>
