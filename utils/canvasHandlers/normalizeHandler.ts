@@ -72,6 +72,16 @@ export function normalize(editStore: (EditorStore & EditorStoreActions & EditorS
             g = editStore.landsat8sr.rawBands.b3.raster;
             b = editStore.landsat8sr.rawBands.b2.raster;
             break;
+        case SatelliteType.landsat5toa:
+            r = editStore.landsat5toa.rawBands.b4.raster;
+            g = editStore.landsat5toa.rawBands.b3.raster;
+            b = editStore.landsat5toa.rawBands.b2.raster;
+            break;
+        case SatelliteType.landsat5sr:
+            r = editStore.landsat5sr.rawBands.b4.raster;
+            g = editStore.landsat5sr.rawBands.b3.raster;
+            b = editStore.landsat5sr.rawBands.b2.raster;
+            break;
     }
 
     worker.postMessage({

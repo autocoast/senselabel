@@ -79,9 +79,32 @@ const route = useRoute()
 
 function bilinearInterpolate() {
     // Determine the highest resolution band
-    const maxResolutionBand = Object.values(editorStore.sentinels2l2a.rawBands).reduce((max, band) => {
-        return band.raster.length > max.raster.length ? band : max;
-    });
+    let maxResolutionBand;
+    if (uploadStore.selectedSatellite === SatelliteType.sentinels2l2a) {
+        maxResolutionBand = Object.values(editorStore.sentinels2l2a.rawBands).reduce((max, band) => {
+            return band.raster.length > max.raster.length ? band : max;
+        });
+    } else if (uploadStore.selectedSatellite === SatelliteType.sentinels2l1c) {
+        maxResolutionBand = Object.values(editorStore.sentinels2l1c.rawBands).reduce((max, band) => {
+            return band.raster.length > max.raster.length ? band : max;
+        });
+    } else if (uploadStore.selectedSatellite === SatelliteType.landsat8toa) {
+        maxResolutionBand = Object.values(editorStore.landsat8toa.rawBands).reduce((max, band) => {
+            return band.raster.length > max.raster.length ? band : max;
+        });
+    } else if (uploadStore.selectedSatellite === SatelliteType.landsat8sr) {
+        maxResolutionBand = Object.values(editorStore.landsat8sr.rawBands).reduce((max, band) => {
+            return band.raster.length > max.raster.length ? band : max;
+        });
+    } else if (uploadStore.selectedSatellite === SatelliteType.landsat5toa) {
+        maxResolutionBand = Object.values(editorStore.landsat5toa.rawBands).reduce((max, band) => {
+            return band.raster.length > max.raster.length ? band : max;
+        }); 
+    } else if (uploadStore.selectedSatellite === SatelliteType.landsat5sr) {
+        maxResolutionBand = Object.values(editorStore.landsat5sr.rawBands).reduce((max, band) => {
+            return band.raster.length > max.raster.length ? band : max;
+        });
+    }
 
     const maxResolution = Math.sqrt(maxResolutionBand.raster.length);
     if (!Number.isInteger(maxResolution)) {
@@ -90,7 +113,21 @@ function bilinearInterpolate() {
 
     const result: Record<string, Uint16Array> = {};
 
-    for (const [bandKey, { raster }] of Object.entries(editorStore.sentinels2l2a.rawBands)) {
+    let entries;
+    if (uploadStore.selectedSatellite === SatelliteType.sentinels2l2a) {
+        entries = Object.entries(editorStore.sentinels2l2a.rawBands);
+    } else if (uploadStore.selectedSatellite === SatelliteType.sentinels2l1c) {
+        entries = Object.entries(editorStore.sentinels2l1c.rawBands);
+    } else if (uploadStore.selectedSatellite === SatelliteType.landsat8toa) {   
+        entries = Object.entries(editorStore.landsat8toa.rawBands);
+    } else if (uploadStore.selectedSatellite === SatelliteType.landsat8sr) {
+        entries = Object.entries(editorStore.landsat8sr.rawBands);
+    } else if (uploadStore.selectedSatellite === SatelliteType.landsat5toa) {
+        entries = Object.entries(editorStore.landsat5toa.rawBands);
+    } else if (uploadStore.selectedSatellite === SatelliteType.landsat5sr) {
+        entries = Object.entries(editorStore.landsat5sr.rawBands);
+    }
+    for (const [bandKey, { raster }] of entries) {
         const resolution = Math.sqrt(raster.length);
         if (!Number.isInteger(resolution)) {
             throw new Error(`Invalid raster length for band ${bandKey}.`);
@@ -132,8 +169,25 @@ function bilinearInterpolate() {
             }
         }
 
-        //@ts-ignore
-        editorStore.sentinels2l2a.rawBands[bandKey].raster = interpolated;
+        if (uploadStore.selectedSatellite === SatelliteType.sentinels2l2a) {
+            //@ts-ignore
+            editorStore.sentinels2l2a.rawBands[bandKey].raster = interpolated;
+        } else if (uploadStore.selectedSatellite === SatelliteType.sentinels2l1c) {
+            //@ts-ignore
+            editorStore.sentinels2l1c.rawBands[bandKey].raster = interpolated;
+        } else if (uploadStore.selectedSatellite === SatelliteType.landsat8toa) {
+            //@ts-ignore
+            editorStore.landsat8toa.rawBands[bandKey].raster = interpolated;
+        } else if (uploadStore.selectedSatellite === SatelliteType.landsat8sr) {
+            //@ts-ignore
+            editorStore.landsat8sr.rawBands[bandKey].raster = interpolated;
+        } else if (uploadStore.selectedSatellite === SatelliteType.landsat5toa) {
+            //@ts-ignore
+            editorStore.landsat5toa.rawBands[bandKey].raster = interpolated;
+        } else if (uploadStore.selectedSatellite === SatelliteType.landsat5sr) {
+            //@ts-ignore
+            editorStore.landsat5sr.rawBands[bandKey].raster = interpolated;
+        }
     }
 }
 
@@ -167,6 +221,18 @@ async function loadTifByUrlAndStore(tifName: string, bandName: string) {
         //@ts-ignore
         editorStore.landsat8sr.rawBands[bandName.toLowerCase()].raster = rasterImage[0] as Uint16Array;
         if (bandName === 'B3') {
+            editorStore.referenceGeoTiff = tifImage;
+        }
+    } else if (uploadStore.selectedSatellite === SatelliteType.landsat5toa) {
+        //@ts-ignore
+        editorStore.landsat5toa.rawBands[bandName.toLowerCase()].raster = rasterImage[0] as Uint16Array;
+        if (bandName === 'B4') {
+            editorStore.referenceGeoTiff = tifImage;
+        }
+    } else if (uploadStore.selectedSatellite === SatelliteType.landsat5sr) {
+        //@ts-ignore
+        editorStore.landsat5sr.rawBands[bandName.toLowerCase()].raster = rasterImage[0] as Uint16Array;
+        if (bandName === 'B4') {
             editorStore.referenceGeoTiff = tifImage;
         }
     }
@@ -205,10 +271,18 @@ async function loadTifByFileAndStore(tif: File, bandName: string, channel?: numb
         //@ts-ignore
         editorStore.landsat8sr.rawBands[bandName.toLowerCase()].raster = rasterImage[0] as Uint16Array;
         if (bandName === 'B3') {
-            console.log('A')
-            console.log(rasterImage)
-            console.log(bandName)
-            console.log('B')
+            editorStore.referenceGeoTiff = tifImage;
+        }
+    } else if (uploadStore.selectedSatellite === SatelliteType.landsat5toa) {
+        //@ts-ignore
+        editorStore.landsat5toa.rawBands[bandName.toLowerCase()].raster = rasterImage[0] as Uint16Array;
+        if (bandName === 'B4') {
+            editorStore.referenceGeoTiff = tifImage;
+        }
+    } else if (uploadStore.selectedSatellite === SatelliteType.landsat5sr) {
+        //@ts-ignore
+        editorStore.landsat5sr.rawBands[bandName.toLowerCase()].raster = rasterImage[0] as Uint16Array;
+        if (bandName === 'B4') {
             editorStore.referenceGeoTiff = tifImage;
         }
     }
@@ -362,6 +436,51 @@ async function loadBandByFile(bandName: string, uploadFile: File, channel?: numb
                 break;
             case 'B11':
                 await loadTifByFileAndStore(uploadFile, 'B11')
+                break;
+        }
+    } else if (uploadStore.selectedSatellite === SatelliteType.landsat5toa) {
+        switch (bandName) {
+            case 'B1':
+                await loadTifByFileAndStore(uploadFile, 'B1')
+                break;
+            case 'B2':
+                await loadTifByFileAndStore(uploadFile, 'B2')
+                break;
+            case 'B3':
+                await loadTifByFileAndStore(uploadFile, 'B3')
+                break;
+            case 'B4':
+                await loadTifByFileAndStore(uploadFile, 'B4')
+                break;
+            case 'B5':
+                await loadTifByFileAndStore(uploadFile, 'B5')
+                break;
+            case 'B6':
+                await loadTifByFileAndStore(uploadFile, 'B6')
+                break;
+            case 'B7':
+                await loadTifByFileAndStore(uploadFile, 'B7')
+                break;
+        }
+    } else if (uploadStore.selectedSatellite === SatelliteType.landsat5sr) {
+        switch (bandName) {
+            case 'B1':
+                await loadTifByFileAndStore(uploadFile, 'B1')
+                break;
+            case 'B2':
+                await loadTifByFileAndStore(uploadFile, 'B2')
+                break;
+            case 'B3':
+                await loadTifByFileAndStore(uploadFile, 'B3')
+                break;
+            case 'B4':
+                await loadTifByFileAndStore(uploadFile, 'B4')
+                break;
+            case 'B5':
+                await loadTifByFileAndStore(uploadFile, 'B5')
+                break;
+            case 'B7':
+                await loadTifByFileAndStore(uploadFile, 'B7')
                 break;
         }
     }
@@ -544,6 +663,28 @@ async function loadEditor() {
                     if (!found && isLayerFile(currentUploadFileName)) {
                         otherLayers.push(uploadStore.uploadedFiles[i].name);
                     }
+                } else if (uploadStore.selectedSatellite === SatelliteType.landsat5toa) {
+                    let found = false;
+                    for (const [key, value] of Object.entries(uploadStore.landsat5toaAssignment)) {
+                        if (value === currentUploadFileName) {
+                            await loadBandByFile(key.replace('Band ', 'B').toUpperCase(), uploadStore.uploadedFiles[i]);
+                            found = true;
+                        }
+                    }
+                    if (!found && isLayerFile(currentUploadFileName)) {
+                        otherLayers.push(uploadStore.uploadedFiles[i].name);
+                    }
+                } else if (uploadStore.selectedSatellite === SatelliteType.landsat5sr) {
+                    let found = false;
+                    for (const [key, value] of Object.entries(uploadStore.landsat5srAssignment)) {
+                        if (value === currentUploadFileName) {
+                            await loadBandByFile(key.replace('Band ', 'B').toUpperCase(), uploadStore.uploadedFiles[i]);
+                            found = true;
+                        }
+                    }
+                    if (!found && isLayerFile(currentUploadFileName)) {
+                        otherLayers.push(uploadStore.uploadedFiles[i].name);
+                    }
                 }
             }
         }
@@ -596,6 +737,13 @@ async function loadEditor() {
             w = Math.sqrt(editorStore.landsat8sr.rawBands.b4.raster.length);
             h = Math.sqrt(editorStore.landsat8sr.rawBands.b4.raster.length);
             break;
+        case SatelliteType.landsat5toa:
+            w = Math.sqrt(editorStore.landsat5toa.rawBands.b4.raster.length);
+            h = Math.sqrt(editorStore.landsat5toa.rawBands.b4.raster.length);
+            break;
+        case SatelliteType.landsat5sr:
+            w = Math.sqrt(editorStore.landsat5sr.rawBands.b4.raster.length);
+            h = Math.sqrt(editorStore.landsat5sr.rawBands.b4.raster.length);
     }
 
     console.log(w, h);
@@ -687,6 +835,28 @@ async function loadEditor() {
             }
             if (uploadStore.useNdwi) {
                 loadNDWI(editorStore, SatelliteType.landsat8sr);
+            }
+            break;
+        case SatelliteType.landsat5toa:
+            if (uploadStore.useNdvi) {
+                loadNDVI(editorStore, SatelliteType.landsat5toa);
+            }
+            if (uploadStore.useAgriculture) {
+                loadAgriculture(editorStore, SatelliteType.landsat5toa);
+            }
+            if (uploadStore.useNdwi) {
+                loadNDWI(editorStore, SatelliteType.landsat5toa);
+            }
+            break;
+        case SatelliteType.landsat5sr:
+            if (uploadStore.useNdvi) {
+                loadNDVI(editorStore, SatelliteType.landsat5sr);
+            }
+            if (uploadStore.useAgriculture) {
+                loadAgriculture(editorStore, SatelliteType.landsat5sr);
+            }
+            if (uploadStore.useNdwi) {
+                loadNDWI(editorStore, SatelliteType.landsat5sr);
             }
             break;
     }

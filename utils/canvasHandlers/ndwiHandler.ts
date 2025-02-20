@@ -65,8 +65,15 @@ export function loadNDWI(editStore: EditorStore, satelliteType: SatelliteType) {
             BLUE = editStore.landsat8sr.rawBands.b2.raster;
             NIR = editStore.landsat8sr.rawBands.b5.raster;
             break;
+        case SatelliteType.landsat5toa:
+            BLUE = editStore.landsat5toa.rawBands.b2.raster;
+            NIR = editStore.landsat5toa.rawBands.b4.raster;
+            break;
+        case SatelliteType.landsat5sr:
+            BLUE = editStore.landsat5sr.rawBands.b2.raster;
+            NIR = editStore.landsat5sr.rawBands.b4.raster;
+            break;
     }
-
 
 
     worker.postMessage({

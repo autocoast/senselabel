@@ -52,6 +52,10 @@
                     class="text-2xl font-bold text-center text-primary dark:text-slate-300">Configure Landsat 8 TOA</h1>
                 <h1 v-if="uploadStore.selectedSatellite === SatelliteType.landsat8sr"
                     class="text-2xl font-bold text-center text-primary dark:text-slate-300">Configure Landsat 8 SR</h1>
+                <h1 v-if="uploadStore.selectedSatellite === SatelliteType.landsat5toa"
+                    class="text-2xl font-bold text-center text-primary dark:text-slate-300">Configure Landsat 5 TOA</h1>
+                <h1 v-if="uploadStore.selectedSatellite === SatelliteType.landsat5sr"
+                    class="text-2xl font-bold text-center text-primary dark:text-slate-300">Configure Landsat 5 SR</h1>
                 <hr class="my-4">
                 </hr>
                 <div v-if="selectableTifFiles.length === 0">
@@ -132,6 +136,42 @@
                             <div class="form-control w-full mb-0">
                                 <select @change="() => {
                                 }" v-model="uploadStore.landsat8srAssignment[band.name]"
+                                    class="select select-bordered select-primary dark:bg-transparent dark:text-coolgreen dark:border-coolgreen bg-primary text-white">
+                                    <option :value="file.name" v-for="file in selectableTifFiles">
+                                        {{ file.name }}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div v-if="uploadStore.selectedSatellite === SatelliteType.landsat5toa" class="flex flex-col">
+                        <div class="flex items-center mb-4  bg-slate-50 rounded-xl p-3 dark:bg-slate-900"
+                            v-for="band in bands">
+                            <div class="w-10/12">
+                                <p class="text-primary">{{ band.name }}</p>
+                                <p class="text-gray-300">{{ band.description }}, {{ band.centralWaveLength }}nm</p>
+                            </div>
+                            <div class="form-control w-full mb-0">
+                                <select @change="() => {
+                                }" v-model="uploadStore.landsat5toaAssignment[band.name]"
+                                    class="select select-bordered select-primary dark:bg-transparent dark:text-coolgreen dark:border-coolgreen bg-primary text-white">
+                                    <option :value="file.name" v-for="file in selectableTifFiles">
+                                        {{ file.name }}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div v-if="uploadStore.selectedSatellite === SatelliteType.landsat5sr" class="flex flex-col">
+                        <div class="flex items-center mb-4  bg-slate-50 rounded-xl p-3 dark:bg-slate-900"
+                            v-for="band in bands">
+                            <div class="w-10/12">
+                                <p class="text-primary">{{ band.name }}</p>
+                                <p class="text-gray-300">{{ band.description }}, {{ band.centralWaveLength }}nm</p>
+                            </div>
+                            <div class="form-control w-full mb-0">
+                                <select @change="() => {
+                                }" v-model="uploadStore.landsat5srAssignment[band.name]"
                                     class="select select-bordered select-primary dark:bg-transparent dark:text-coolgreen dark:border-coolgreen bg-primary text-white">
                                     <option :value="file.name" v-for="file in selectableTifFiles">
                                         {{ file.name }}
@@ -270,7 +310,40 @@ function probablyHasBandName(bandName: string): string {
                     }
                 }
             };
+        } else if (uploadStore.selectedSatellite === SatelliteType.landsat5toa) {
+            let l5toaPreAssignment = parsedBandAssignments['landsat5toa'];
+            if (!_.isEmpty(l5toaPreAssignment)) {
+                for (let band of bands.value) {
+                    if (band.name === bandName) {
+                        for (const [key, value] of Object.entries(l5toaPreAssignment)) {
+                            if (band.name === key) {
+                                let foundFn = uploadStore.uploadedFiles.find(x => x.name == value);
+                                if (foundFn) {
+                                    return foundFn.name;
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+        } else if (uploadStore.selectedSatellite === SatelliteType.landsat5sr) {
+            let l5srPreAssignment = parsedBandAssignments['landsat5sr'];
+            if (!_.isEmpty(l5srPreAssignment)) {
+                for (let band of bands.value) {
+                    if (band.name === bandName) {
+                        for (const [key, value] of Object.entries(l5srPreAssignment)) {
+                            if (band.name === key) {
+                                let foundFn = uploadStore.uploadedFiles.find(x => x.name == value);
+                                if (foundFn) {
+                                    return foundFn.name;
+                                }
+                            }
+                        }
+                    }
+                }
+            };
         }
+
     }
 
     if (uploadStore.selectedSatellite === SatelliteType.sentinels2l2a) {
@@ -406,6 +479,108 @@ function probablyHasBandName(bandName: string): string {
             }
         }
     }
+
+    if (uploadStore.selectedSatellite === SatelliteType.landsat5toa) {
+        let bandSplit = bandName.split(' ');  // e.g. Band 1
+        let candidate1 = 'B' + bandSplit[1] + '.tif';
+        let candidate2 = 'B' + bandSplit[1] + '.tiff';
+
+        for (let i = 0; i < selectableTifFiles.value.length; i++) {
+            let filename = selectableTifFiles.value[i].name;
+            if (filename.includes(candidate1) || filename.includes(candidate2)) {
+                uploadStore.landsat5toaAssignment[bandName] = filename;
+                return filename;
+            }
+        }
+
+        for (let i = 0; i < selectableTifFiles.value.length; i++) {
+            let filename = selectableTifFiles.value[i].name;
+            if (filename.includes(bandSplit[1])) {
+                uploadStore.landsat5toaAssignment[bandName] = filename;
+                return filename;
+            }
+        }
+
+        const regex1 = new RegExp(`(^|[^0-9])${bandSplit[1]}([^0-9]|$)`);
+        const regex2 = new RegExp(`(^|[^0-9])0${bandSplit[1]}([^0-9]|$)`);
+        // return regex.test(str);
+
+        for (let i = 0; i < selectableTifFiles.value.length; i++) {
+            let filename = selectableTifFiles.value[i].name;
+            if (regex1.test(filename) || regex2.test(filename)) {
+                uploadStore.landsat5toaAssignment[bandName] = filename;
+                return filename;
+            }
+        }
+    }
+
+    if (uploadStore.selectedSatellite === SatelliteType.landsat5sr) {
+        let bandSplit = bandName.split(' ');  // e.g. Band 1
+        let candidate1 = 'B' + bandSplit[1] + '.tif';
+        let candidate2 = 'B' + bandSplit[1] + '.tiff';
+
+        for (let i = 0; i < selectableTifFiles.value.length; i++) {
+            let filename = selectableTifFiles.value[i].name;
+            if (filename.includes(candidate1) || filename.includes(candidate2)) {
+                uploadStore.landsat5srAssignment[bandName] = filename;
+                return filename;
+            }
+        }
+
+        for (let i = 0; i < selectableTifFiles.value.length; i++) {
+            let filename = selectableTifFiles.value[i].name;
+            if (filename.includes(bandSplit[1])) {
+                uploadStore.landsat5srAssignment[bandName] = filename;
+                return filename;
+            }
+        }
+
+        const regex1 = new RegExp(`(^|[^0-9])${bandSplit[1]}([^0-9]|$)`);
+        const regex2 = new RegExp(`(^|[^0-9])0${bandSplit[1]}([^0-9]|$)`);
+
+        for (let i = 0; i < selectableTifFiles.value.length; i++) {
+            let filename = selectableTifFiles.value[i].name;
+            if (regex1.test(filename) || regex2.test(filename)) {
+                uploadStore.landsat5srAssignment[bandName] = filename;
+                return filename;
+            }
+        }
+    }
+
+    if (uploadStore.selectedSatellite === SatelliteType.landsat5toa) {
+        let bandSplit = bandName.split(' ');  // e.g. Band 1
+        let candidate1 = 'B' + bandSplit[1] + '.tif';
+        let candidate2 = 'B' + bandSplit[1] + '.tiff';
+
+        for (let i = 0; i < selectableTifFiles.value.length; i++) {
+            let filename = selectableTifFiles.value[i].name;
+            if (filename.includes(candidate1) || filename.includes(candidate2)) {
+                uploadStore.landsat5toaAssignment[bandName] = filename;
+                return filename;
+            }
+        }
+
+        for (let i = 0; i < selectableTifFiles.value.length; i++) {
+            let filename = selectableTifFiles.value[i].name;
+            if (filename.includes(bandSplit[1])) {
+                uploadStore.landsat5toaAssignment[bandName] = filename;
+                return filename;
+            }
+        }
+
+        const regex1 = new RegExp(`(^|[^0-9])${bandSplit[1]}([^0-9]|$)`);
+        const regex2 = new RegExp(`(^|[^0-9])0${bandSplit[1]}([^0-9]|$)`);
+
+        for (let i = 0; i < selectableTifFiles.value.length; i++) {
+            let filename = selectableTifFiles.value[i].name;
+            if (regex1.test(filename) || regex2.test(filename)) {
+                uploadStore.landsat5toaAssignment[bandName] = filename;
+                return filename;
+            }
+        }
+    }
+
+
 
 
     return '';
@@ -511,6 +686,52 @@ function saveToCache() {
             };
             localStorage.setItem('bandAssignments', JSON.stringify(newAssignment));
         }
+    } else if (uploadStore.selectedSatellite === SatelliteType.landsat5toa) {
+        if (bandAssignments) {
+            let parsedBandAssignments: Record<string, any> = JSON.parse(bandAssignments);
+
+            if (_.has(parsedBandAssignments, 'landsat5toa')) {
+                let l5toaPreAssignment: Record<string, string> = parsedBandAssignments['landsat5toa'];
+
+                l5toaPreAssignment = _.cloneDeep(uploadStore.landsat5toaAssignment);
+                parsedBandAssignments['landsat5toa'] = l5toaPreAssignment;
+
+                // save
+                localStorage.setItem('bandAssignments', JSON.stringify(parsedBandAssignments));
+            } else {
+                parsedBandAssignments['landsat5toa'] = _.cloneDeep(uploadStore.landsat5toaAssignment);
+                // save
+                localStorage.setItem('bandAssignments', JSON.stringify(parsedBandAssignments));
+            }
+        } else {
+            let newAssignment = {
+                'landsat5toa': _.cloneDeep(uploadStore.landsat5toaAssignment)
+            };
+            localStorage.setItem('bandAssignments', JSON.stringify(newAssignment));
+        }
+    } else if (uploadStore.selectedSatellite === SatelliteType.landsat5sr) {
+        if (bandAssignments) {
+            let parsedBandAssignments: Record<string, any> = JSON.parse(bandAssignments);
+
+            if (_.has(parsedBandAssignments, 'landsat5sr')) {
+                let l5srPreAssignment: Record<string, string> = parsedBandAssignments['landsat5sr'];
+
+                l5srPreAssignment = _.cloneDeep(uploadStore.landsat5srAssignment);
+                parsedBandAssignments['landsat5sr'] = l5srPreAssignment;
+
+                // save
+                localStorage.setItem('bandAssignments', JSON.stringify(parsedBandAssignments));
+            } else {
+                parsedBandAssignments['landsat5sr'] = _.cloneDeep(uploadStore.landsat5srAssignment);
+                // save
+                localStorage.setItem('bandAssignments', JSON.stringify(parsedBandAssignments));
+            }
+        } else {
+            let newAssignment = {
+                'landsat5sr': _.cloneDeep(uploadStore.landsat5srAssignment)
+            };
+            localStorage.setItem('bandAssignments', JSON.stringify(newAssignment));
+        }
     }
 
     // if (uploadStore.selectedSatellite === 'sentinel-2') {
@@ -556,6 +777,10 @@ onMounted(async () => {
         bands.value = config['landsat-8-toa-bands'];
     } else if (uploadStore.selectedSatellite === SatelliteType.landsat8sr) {
         bands.value = config['landsat-8-sr-bands'];
+    } else if (uploadStore.selectedSatellite === SatelliteType.landsat5toa) {
+        bands.value = config['landsat-5-toa-bands'];
+    } else if (uploadStore.selectedSatellite === SatelliteType.landsat5sr) {
+        bands.value = config['landsat-5-sr-bands'];
     }
 
     let files = [];
@@ -595,6 +820,10 @@ onMounted(async () => {
                 uploadStore.sentinels2cAssignment[band.name] = initialSelection;
             } else if (uploadStore.selectedSatellite === SatelliteType.landsat8sr) {
                 uploadStore.landsat8srAssignment[band.name] = initialSelection;
+            } else if (uploadStore.selectedSatellite === SatelliteType.landsat5toa) {
+                uploadStore.landsat5toaAssignment[band.name] = initialSelection;
+            } else if (uploadStore.selectedSatellite === SatelliteType.landsat5sr) {
+                uploadStore.landsat5srAssignment[band.name] = initialSelection;
             }
         }
     });

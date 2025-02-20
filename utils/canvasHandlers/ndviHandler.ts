@@ -65,8 +65,15 @@ export function loadNDVI(editStore: EditorStore, satelliteType: SatelliteType) {
             RED = editStore.landsat8sr.rawBands.b4.raster;
             NIR = editStore.landsat8sr.rawBands.b5.raster;
             break;
+        case SatelliteType.landsat5toa:
+            RED = editStore.landsat5toa.rawBands.b3.raster;
+            NIR = editStore.landsat5toa.rawBands.b4.raster;
+            break;
+        case SatelliteType.landsat5sr:
+            RED = editStore.landsat5sr.rawBands.b3.raster;
+            NIR = editStore.landsat5sr.rawBands.b4.raster;
+            break;
     }
-
 
 
     worker.postMessage({

@@ -308,5 +308,102 @@ export default {
             'centralWaveLength': 2.107,
             'description': 'Shortwave Infrared 2'
         }
+    ],
+    'landsat-5-toa-bands': [
+        {
+            'name': 'Band 1',
+            'resolution': 30,
+            'centralWaveLength': 0.452,
+            'description': 'Blue',
+            'wavelength': 0.452
+        },
+        {
+            'name': 'Band 2',
+            'resolution': 30,
+            'centralWaveLength': 0.525,
+            'description': 'Green',
+            'wavelength': 0.525
+        },
+        {
+            'name': 'Band 3',
+            'resolution': 30,
+            'centralWaveLength': 0.636,
+            'description': 'Red',
+            'wavelength': 0.636
+        },
+        {
+            'name': 'Band 4',
+            'resolution': 30,
+            'centralWaveLength': 0.770,
+            'description': 'NIR',
+            'wavelength': 0.770
+        },
+        {
+            'name': 'Band 5',
+            'resolution': 30,
+            'centralWaveLength': 1.550,
+            'description': 'SWIR',
+            'wavelength': 1.550
+        },
+        {
+            'name': 'Band 6',
+            'resolution': 30,
+            'centralWaveLength': 10.40,
+            'description': 'Thermal Infrared 1',
+            'wavelength': 10.40
+        },
+        {
+            'name': 'Band 7',
+            'resolution': 30,
+            'centralWaveLength': 2.080,
+            'description': 'SWIR',
+            'wavelength': 2.080
+        }
+    ],
+    'landsat-5-sr-bands': [
+        {
+            'name': 'Band 1',
+            'resolution': 30,
+            'centralWaveLength': 0.452,
+            'description': 'Blue',
+            'wavelength': 0.452
+        },
+        {
+            'name': 'Band 2',
+            'resolution': 30,
+            'centralWaveLength': 0.525,
+            'description': 'Green',
+            'wavelength': 0.525
+        },
+        {
+            'name': 'Band 3',
+            'resolution': 30,
+            'centralWaveLength': 0.636,
+            'description': 'Red',
+            'wavelength': 0.636
+        },
+        {
+            'name': 'Band 4',
+            'resolution': 30,
+            'centralWaveLength': 0.770,
+            'description': 'NIR',
+            'wavelength': 0.770
+        },
+        {
+            'name': 'Band 5',
+            'resolution': 30,
+            'centralWaveLength': 1.550,
+            'description': 'SWIR',
+            'wavelength': 1.550
+        },
+        {
+            'name': 'Band 7',
+            'resolution': 30,
+            'centralWaveLength': 2.080,
+            'description': 'SWIR',
+            'wavelength': 2.080
+        }
     ]
+    
+    
 }

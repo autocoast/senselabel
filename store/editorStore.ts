@@ -258,6 +258,56 @@ export const useEditorStore = defineStore<'editorStore', EditorStore, EditorStor
                     raster: new Uint16Array()
                 }
             }
+        },
+        landsat5sr: {
+            rawBands: {
+                b1: {
+                    raster: new Uint16Array()
+                },
+                b2: {
+                    raster: new Uint16Array()
+                },
+                b3: {
+                    raster: new Uint16Array()
+                },
+                b4: {
+                    raster: new Uint16Array()
+                },
+                b5: {
+                    raster: new Uint16Array()
+                },
+                b6: {
+                    raster: new Uint16Array()
+                },
+                b7: {
+                    raster: new Uint16Array()
+                }
+            }
+        },
+        landsat5toa: {
+            rawBands: {
+                b1: {
+                    raster: new Uint16Array()
+                },
+                b2: {
+                    raster: new Uint16Array()
+                },
+                b3: {
+                    raster: new Uint16Array()
+                },
+                b4: {
+                    raster: new Uint16Array()
+                },
+                b5: {
+                    raster: new Uint16Array()
+                },
+                b6: {
+                    raster: new Uint16Array()
+                },
+                b7: {
+                    raster: new Uint16Array()
+                }
+            }
         }
     }),
     getters: {
@@ -290,6 +340,12 @@ export const useEditorStore = defineStore<'editorStore', EditorStore, EditorStor
                     break
                 case SatelliteType.landsat8sr:
                     normalize(this, this.currentNormalization, SatelliteType.landsat8sr);
+                    break
+                case SatelliteType.landsat5sr:
+                    normalize(this, this.currentNormalization, SatelliteType.landsat5sr);
+                    break
+                case SatelliteType.landsat5toa:
+                    normalize(this, this.currentNormalization, SatelliteType.landsat5toa);
                     break
             }
         },
@@ -372,6 +428,12 @@ export const useEditorStore = defineStore<'editorStore', EditorStore, EditorStor
                         break
                     case SatelliteType.landsat8sr:
                         ctx.putImageData(normalizeBy1And99Percentile([this.landsat8sr.rawBands.b4.raster, this.landsat8sr.rawBands.b3.raster, this.landsat8sr.rawBands.b2.raster], width, height), 0, 0);
+                        break
+                    case SatelliteType.landsat5toa:
+                        ctx.putImageData(normalizeBy1And99Percentile([this.landsat5toa.rawBands.b4.raster, this.landsat5toa.rawBands.b3.raster, this.landsat5toa.rawBands.b2.raster], width, height), 0, 0);
+                        break
+                    case SatelliteType.landsat5sr:
+                        ctx.putImageData(normalizeBy1And99Percentile([this.landsat5sr.rawBands.b4.raster, this.landsat5sr.rawBands.b3.raster, this.landsat5sr.rawBands.b2.raster], width, height), 0, 0);
                         break
                 }
                 ctx!.imageSmoothingEnabled = false;

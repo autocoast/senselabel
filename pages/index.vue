@@ -65,6 +65,8 @@
                         <option :value="SatelliteType.sentinels2l1c">Sentinel-2 L1C</option>
                         <option :value="SatelliteType.landsat8toa">Landsat-8 TOA</option>
                         <option :value="SatelliteType.landsat8sr">Landsat-8 SR</option>
+                        <option :value="SatelliteType.landsat5toa">Landsat-5 TOA</option>
+                        <option :value="SatelliteType.landsat5sr">Landsat-5 SR</option>
                     </select>
 
 
@@ -135,7 +137,7 @@
                             </div>
 
                             <!-- Upload Text -->
-                            <div class="text-center space-y-2">
+                            <div class="text-center space-y-5">
                                 <p class="text-base dark:text-coolgreen">
                                     <span class="font-semibold">Drop your folder here</span> or
                                 </p>
@@ -145,7 +147,7 @@
                                     @change="handleFileUpload" />
                                 <label for="file-upload"
                                     class="dark:text-coolgreen dark:bg-transparent dark:border-coolgreen dark:hover:bg-coolgreen/10 
-                                        btn btn-primary hover:bg-slate-900 cursor-pointer inline-block">
+                                        btn btn-primary hover:bg-slate-900 cursor-pointer inline-flex items-center justify-center w-32">
                                     Browse Folder
                                 </label>
                                 <p class="text-sm text-gray-500 dark:text-gray-400">
