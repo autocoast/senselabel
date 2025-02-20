@@ -51,7 +51,7 @@ export function bucketFillWorker(targetCanvas: HTMLCanvasElement, startX: number
     worker.onmessage = (event) => {
         const { imageData: updatedData } = event.data;
 
-        const newImageData = new ImageData(new Uint8ClampedArray(updatedData), 480, 480);
+        const newImageData = new ImageData(new Uint8ClampedArray(updatedData), sourceLayerCanvas.width, sourceLayerCanvas.height);
 
         context.clearRect(0, 0, targetCanvas.width, targetCanvas.height);
         context.putImageData(newImageData, 0, 0);
