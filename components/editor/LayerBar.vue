@@ -111,20 +111,31 @@ function discreteToContinuos(layerName: string) {
             switch (uploadStore.selectedSatellite) {
                 case SatelliteType.sentinels2l2a:
                     loadNDVI(editorStore, SatelliteType.sentinels2l2a);
+                    break;
                 case SatelliteType.landsat8toa:
                     loadNDVI(editorStore, SatelliteType.landsat8toa);
+                    break;
                 case SatelliteType.sentinels2l1c:
                     loadNDVI(editorStore, SatelliteType.sentinels2l1c);
+                    break;
+                case SatelliteType.landsat8sr:
+                    loadNDVI(editorStore, SatelliteType.landsat8sr);
+                    break;
             }
             break;
         case 'Agriculture':
             switch (uploadStore.selectedSatellite) {
                 case SatelliteType.sentinels2l2a:
                     loadAgriculture(editorStore, SatelliteType.sentinels2l2a);
+                    break;
                 case SatelliteType.landsat8toa:
                     loadAgriculture(editorStore, SatelliteType.landsat8toa);
+                    break;
                 case SatelliteType.sentinels2l1c:
                     loadAgriculture(editorStore, SatelliteType.sentinels2l1c);
+                    break;
+                case SatelliteType.landsat8sr:
+                    loadAgriculture(editorStore, SatelliteType.landsat8sr);
                     break;
             }
             break;
@@ -132,10 +143,15 @@ function discreteToContinuos(layerName: string) {
             switch (uploadStore.selectedSatellite) {
                 case SatelliteType.sentinels2l2a:
                     loadNDWI(editorStore, SatelliteType.sentinels2l2a);
+                    break;
                 case SatelliteType.landsat8toa:
                     loadNDWI(editorStore, SatelliteType.landsat8toa);
+                    break;
                 case SatelliteType.sentinels2l1c:
                     loadNDWI(editorStore, SatelliteType.sentinels2l1c);
+                    break;
+                case SatelliteType.landsat8sr:
+                    loadNDWI(editorStore, SatelliteType.landsat8sr);
                     break;
             }
             break;

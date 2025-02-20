@@ -264,5 +264,49 @@ export default {
             'centralWaveLength': 12000,
             'description': 'Thermal Infrared 2'
         }
+    ],
+    'landsat-8-sr-bands': [
+        {
+            'name': 'Band 1',
+            'resolution': 30,
+            'centralWaveLength': 0.435,
+            'description': 'Coastal/Aerosol'
+        },
+        {
+            'name': 'Band 2',
+            'resolution': 30,
+            'centralWaveLength': 0.452,
+            'description': 'Blue'
+        },
+        {
+            'name': 'Band 3',
+            'resolution': 30,
+            'centralWaveLength': 0.533,
+            'description': 'Green'
+        },
+        {
+            'name': 'Band 4',
+            'resolution': 30,
+            'centralWaveLength': 0.636,
+            'description': 'Red'
+        },
+        {
+            'name': 'Band 5',
+            'resolution': 30,
+            'centralWaveLength': 0.851,
+            'description': 'Near Infrared'
+        },
+        {
+            'name': 'Band 6',
+            'resolution': 30,
+            'centralWaveLength': 1.566,
+            'description': 'Shortwave Infrared 1'
+        },
+        {
+            'name': 'Band 7',
+            'resolution': 30,
+            'centralWaveLength': 2.107,
+            'description': 'Shortwave Infrared 2'
+        }
     ]
 }

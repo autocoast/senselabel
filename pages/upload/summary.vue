@@ -232,8 +232,26 @@ function getOtherLayers() {
                 });
             }
 
-        }
+        } else if (uploadStore.selectedSatellite === SatelliteType.landsat8sr) {
+            let found = false;
+            for (const [key, value] of Object.entries(uploadStore.landsat8srAssignment)) {
+                if (value === fileName) {
+                    found = true;
+                }
+            }
+            if (found) {
+                continue;
+            }
 
+            if (fileName.endsWith('.jpg') || fileName.endsWith('.png') || fileName.endsWith('.jpeg') || fileName.endsWith('.tif') || fileName.endsWith('.tiff') || fileName.endsWith('.bmp')) {
+                otherLayers.value.push({
+                    name: fileName,
+                    isLayer: true,
+                    displayAlways: false,
+                    legendToLayer: ''
+                });
+            }
+        }
     }
 }
 

@@ -233,6 +233,31 @@ export const useEditorStore = defineStore<'editorStore', EditorStore, EditorStor
                     raster: new Uint16Array()
                 },
             }
+        },
+        landsat8sr: {
+            rawBands: {
+                b1: {
+                    raster: new Uint16Array()
+                },
+                b2: {
+                    raster: new Uint16Array()
+                },
+                b3: {
+                    raster: new Uint16Array()
+                },
+                b4: {
+                    raster: new Uint16Array()
+                },
+                b5: {
+                    raster: new Uint16Array()
+                },
+                b6: {
+                    raster: new Uint16Array()
+                },
+                b7: {
+                    raster: new Uint16Array()
+                }
+            }
         }
     }),
     getters: {
@@ -262,6 +287,9 @@ export const useEditorStore = defineStore<'editorStore', EditorStore, EditorStor
                     break
                 case SatelliteType.sentinels2l1c:
                     normalize(this, this.currentNormalization, SatelliteType.sentinels2l1c);
+                    break
+                case SatelliteType.landsat8sr:
+                    normalize(this, this.currentNormalization, SatelliteType.landsat8sr);
                     break
             }
         },
@@ -341,6 +369,9 @@ export const useEditorStore = defineStore<'editorStore', EditorStore, EditorStor
                         break;
                     case SatelliteType.landsat8toa:
                         ctx.putImageData(normalizeBy1And99Percentile([this.landsat8toa.rawBands.b4.raster, this.landsat8toa.rawBands.b3.raster, this.landsat8toa.rawBands.b2.raster], width, height), 0, 0);
+                        break
+                    case SatelliteType.landsat8sr:
+                        ctx.putImageData(normalizeBy1And99Percentile([this.landsat8sr.rawBands.b4.raster, this.landsat8sr.rawBands.b3.raster, this.landsat8sr.rawBands.b2.raster], width, height), 0, 0);
                         break
                 }
                 ctx!.imageSmoothingEnabled = false;
@@ -447,9 +478,11 @@ export const useEditorStore = defineStore<'editorStore', EditorStore, EditorStor
             document.getElementById('layers')!.appendChild(imageLayerCanvas);
             let ctx = imageLayerCanvas.getContext('2d');
             let img = new Image();
+            console.log(width);
+            console.log(imageFile);
             img.src = URL.createObjectURL(imageFile);
             img.onload = () => {
-                ctx!.drawImage(img, 0, 0);
+                ctx!.drawImage(img, 0, 0, width, height);
                 document.getElementById('layers')!.appendChild(imageLayerCanvas);
                 this.addLayer(layerName, imageLayerCanvas);
             };

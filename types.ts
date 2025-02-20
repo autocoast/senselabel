@@ -201,6 +201,31 @@ export interface EditorStore {
             },
         }
     }
+    landsat8sr: {
+        rawBands: {
+            b1: {
+                raster: Uint16Array
+            },
+            b2: {
+                raster: Uint16Array
+            },
+            b3: {
+                raster: Uint16Array
+            },
+            b4: {
+                raster: Uint16Array
+            },
+            b5: {
+                raster: Uint16Array
+            },
+            b6: {
+                raster: Uint16Array
+            },
+            b7: {
+                raster: Uint16Array
+            },
+        }
+    }
 }
 
 export interface EditorStoreGetters {
@@ -242,6 +267,7 @@ export interface UploadStore {
     useAgriculture: boolean;
     sentinels2aAssignment: Record<string, string>;
     sentinels2cAssignment: Record<string, string>;
+    landsat8srAssignment: Record<string, string>;
     landsat8toaAssignment: Record<string, string>;
     classes: {
         id: number,
@@ -269,4 +295,5 @@ export enum SatelliteType {
     'sentinels2l2a' = 'sentinels2l2a',
     'sentinels2l1c' = 'sentinels2l1c',
     'landsat8toa' = 'landsat8toa',
+    'landsat8sr' = 'landsat8sr'
 }

@@ -163,13 +163,24 @@ async function loadTifByUrlAndStore(tifName: string, bandName: string) {
         if (bandName === 'B3') {
             editorStore.referenceGeoTiff = tifImage;
         }
+    } else if (uploadStore.selectedSatellite === SatelliteType.landsat8sr) {
+        //@ts-ignore
+        editorStore.landsat8sr.rawBands[bandName.toLowerCase()].raster = rasterImage[0] as Uint16Array;
+        if (bandName === 'B3') {
+            editorStore.referenceGeoTiff = tifImage;
+        }
     }
 }
 
-async function loadTifByFileAndStore(tif: File, bandName: string) {
+async function loadTifByFileAndStore(tif: File, bandName: string, channel?: number | undefined) {
     const tifImage = await fromArrayBuffer(await tif.arrayBuffer());
     const image: GeoTIFFImage = await tifImage.getImage();
-    const rasterImage: ReadRasterResult = await image.readRasters()
+    let rasterImage: ReadRasterResult = await image.readRasters();
+    if (channel && channel !== -1) {
+        rasterImage = [rasterImage[channel]] as ReadRasterResult;
+    }
+
+    console.log(tif);
 
     if (uploadStore.selectedSatellite === SatelliteType.sentinels2l2a) {
         //@ts-ignore
@@ -190,10 +201,20 @@ async function loadTifByFileAndStore(tif: File, bandName: string) {
         if (bandName === 'B3') {
             editorStore.referenceGeoTiff = tifImage;
         }
+    } else if (uploadStore.selectedSatellite === SatelliteType.landsat8sr) {
+        //@ts-ignore
+        editorStore.landsat8sr.rawBands[bandName.toLowerCase()].raster = rasterImage[0] as Uint16Array;
+        if (bandName === 'B3') {
+            console.log('A')
+            console.log(rasterImage)
+            console.log(bandName)
+            console.log('B')
+            editorStore.referenceGeoTiff = tifImage;
+        }
     }
 }
 
-async function loadBandByFile(bandName: string, uploadFile: File) {
+async function loadBandByFile(bandName: string, uploadFile: File, channel?: number | undefined) {
     if (uploadStore.selectedSatellite === SatelliteType.sentinels2l2a) {
         switch (bandName) {
             case 'B1':
@@ -282,7 +303,31 @@ async function loadBandByFile(bandName: string, uploadFile: File) {
             case 'B13':
                 break;
         }
-
+    } else if (uploadStore.selectedSatellite === SatelliteType.landsat8sr) {
+        console.log('bname', bandName);
+        switch (bandName) {
+            case 'B1':
+                await loadTifByFileAndStore(uploadFile, 'B1')
+                break;
+            case 'B2':
+                await loadTifByFileAndStore(uploadFile, 'B2')
+                break;
+            case 'B3':
+                await loadTifByFileAndStore(uploadFile, 'B3')
+                break;
+            case 'B4':
+                await loadTifByFileAndStore(uploadFile, 'B4')
+                break;
+            case 'B5':
+                await loadTifByFileAndStore(uploadFile, 'B5')
+                break;
+            case 'B6':
+                await loadTifByFileAndStore(uploadFile, 'B6')
+                break;
+            case 'B7':
+                await loadTifByFileAndStore(uploadFile, 'B7')
+                break;
+        }
     } else if (uploadStore.selectedSatellite === SatelliteType.landsat8toa) {
         switch (bandName) {
             case 'B1':
@@ -413,6 +458,7 @@ watch(() => navStore.currentLinkIndex, () => {
 
 async function loadEditor() {
 
+
     if (document) {
         document.querySelectorAll('[id^="permanent_legend"]')?.forEach((element) => {
             element.remove();
@@ -453,7 +499,11 @@ async function loadEditor() {
                 if (uploadStore.selectedSatellite === SatelliteType.sentinels2l2a) {
                     let found = false;
                     for (const [key, value] of Object.entries(uploadStore.sentinels2aAssignment)) {
-                        if (value === currentUploadFileName) {
+                        let cleanedValue = value;
+                        if (value.startsWith('[Channel')) {
+                            cleanedValue = value.split('] ')[1];
+                        }
+                        if (cleanedValue === currentUploadFileName) {
                             await loadBandByFile(key.replace('Band ', 'B').toUpperCase(), uploadStore.uploadedFiles[i]);
                             found = true;
                         }
@@ -475,6 +525,17 @@ async function loadEditor() {
                 } else if (uploadStore.selectedSatellite === SatelliteType.sentinels2l1c) {
                     let found = false;
                     for (const [key, value] of Object.entries(uploadStore.sentinels2cAssignment)) {
+                        if (value === currentUploadFileName) {
+                            await loadBandByFile(key.replace('Band ', 'B').toUpperCase(), uploadStore.uploadedFiles[i]);
+                            found = true;
+                        }
+                    }
+                    if (!found && isLayerFile(currentUploadFileName)) {
+                        otherLayers.push(uploadStore.uploadedFiles[i].name);
+                    }
+                } else if (uploadStore.selectedSatellite === SatelliteType.landsat8sr) {
+                    let found = false;
+                    for (const [key, value] of Object.entries(uploadStore.landsat8srAssignment)) {
                         if (value === currentUploadFileName) {
                             await loadBandByFile(key.replace('Band ', 'B').toUpperCase(), uploadStore.uploadedFiles[i]);
                             found = true;
@@ -531,7 +592,13 @@ async function loadEditor() {
             w = Math.sqrt(editorStore.landsat8toa.rawBands.b4.raster.length);
             h = Math.sqrt(editorStore.landsat8toa.rawBands.b4.raster.length);
             break;
+        case SatelliteType.landsat8sr:
+            w = Math.sqrt(editorStore.landsat8sr.rawBands.b4.raster.length);
+            h = Math.sqrt(editorStore.landsat8sr.rawBands.b4.raster.length);
+            break;
     }
+
+    console.log(w, h);
 
     editorStore.width = w;
     editorStore.height = h;
@@ -609,6 +676,17 @@ async function loadEditor() {
             }
             if (uploadStore.useNdwi) {
                 loadNDWI(editorStore, SatelliteType.landsat8toa);
+            }
+            break;
+        case SatelliteType.landsat8sr:
+            if (uploadStore.useNdvi) {
+                loadNDVI(editorStore, SatelliteType.landsat8sr);
+            }
+            if (uploadStore.useAgriculture) {
+                loadAgriculture(editorStore, SatelliteType.landsat8sr);
+            }
+            if (uploadStore.useNdwi) {
+                loadNDWI(editorStore, SatelliteType.landsat8sr);
             }
             break;
     }

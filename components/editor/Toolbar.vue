@@ -112,6 +112,13 @@
             <option v-for="norm in normalizations" :key="norm" :value="norm">{{ normTypeToDisplayName(norm) }}
             </option>
         </select>
+        <select v-if="uploadStore.selectedSatellite === SatelliteType.landsat8sr"
+            v-model="editorStore.currentNormalization"
+            @change="normalize(editorStore, editorStore.currentNormalization, SatelliteType.landsat8sr)"
+            class="select w-full max-w-xs select-xs text-slate-500 mt-0 dark:bg-slate-950" style="margin-top: 0;">
+            <option v-for="norm in normalizations" :key="norm" :value="norm">{{ normTypeToDisplayName(norm) }}
+            </option>
+        </select>
         <div class="indicator">
             <span v-if="editorStore.showHotkeys"
                 class="indicator-item badge badge-primary dark:bg-slate-950 dark:border-none dark:text-coolgreen">{{
