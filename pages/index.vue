@@ -274,7 +274,6 @@ const submit = () => {
 
 
 const traverseDirectory = async (entry: FileSystemEntry, files: File[], rootPath: string) => {
-    console.log('traverseDirectory', entry);
     try {
         if (entry.isFile) {
             const file = await getFileFromEntry(entry);
@@ -303,7 +302,6 @@ const traverseDirectory = async (entry: FileSystemEntry, files: File[], rootPath
             });
 
             // Debug log
-            console.log('Processing file:', fullRelativePath);
             files.push(customFile);
             
             // Check if file is at correct depth (root/subfolder/file)

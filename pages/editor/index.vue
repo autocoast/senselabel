@@ -246,8 +246,6 @@ async function loadTifByFileAndStore(tif: File, bandName: string, channel?: numb
         rasterImage = [rasterImage[channel]] as ReadRasterResult;
     }
 
-    console.log(tif);
-
     if (uploadStore.selectedSatellite === SatelliteType.sentinels2l2a) {
         //@ts-ignore
         editorStore.sentinels2l2a.rawBands[bandName.toLowerCase()].raster = rasterImage[0] as Uint16Array;
@@ -378,7 +376,7 @@ async function loadBandByFile(bandName: string, uploadFile: File, channel?: numb
                 break;
         }
     } else if (uploadStore.selectedSatellite === SatelliteType.landsat8sr) {
-        console.log('bname', bandName);
+
         switch (bandName) {
             case 'B1':
                 await loadTifByFileAndStore(uploadFile, 'B1')
@@ -570,13 +568,14 @@ async function getCornerCoordinates(tiff: GeoTIFF): Promise<[number, number][]> 
     return wgs84Corners;
 }
 
-watch(() => navStore.currentLinkIndex, () => {
+watch(() => navStore.currentLinkIndex, async () => {
     editorStore.resetStore();
-    loadEditor();
+
+    await loadEditor();
+    await nextTick();
 });
 
 async function loadEditor() {
-
 
     if (document) {
         document.querySelectorAll('[id^="permanent_legend"]')?.forEach((element) => {
@@ -585,6 +584,8 @@ async function loadEditor() {
         document.querySelectorAll('[id^="legend___"]')?.forEach((element) => {
             element.remove();
         });
+        document.getElementById('layers')!.innerHTML = '';
+        document.getElementById('drawingContainer')!.innerHTML = '';
     }
 
     await settingStore.loadSettings();
@@ -745,8 +746,6 @@ async function loadEditor() {
             w = Math.sqrt(editorStore.landsat5sr.rawBands.b4.raster.length);
             h = Math.sqrt(editorStore.landsat5sr.rawBands.b4.raster.length);
     }
-
-    console.log(w, h);
 
     editorStore.width = w;
     editorStore.height = h;

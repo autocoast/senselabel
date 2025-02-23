@@ -33,6 +33,19 @@
                 <canvas id="autofill"></canvas>
             </div>
         </div>
+        <!-- Left and Right Arrow Keys -->
+        <div id="leftArrow" class="absolute left-0 top-1/2 -translate-y-1/2 z-50 bg-slate-100 ml-10" @click="() => {
+            navStore.currentLinkIndex = Math.max(0, navStore.currentLinkIndex - 1);
+            navStore.editorDrawerOpen = false;
+        }">
+            <Icon name="mdi:arrow-left" class="w-10 h-10" />
+        </div>
+        <div id="rightArrow" class="absolute right-0 top-1/2 -translate-y-1/2 bg-slate-100 mr-10" @click="() => {
+            navStore.currentLinkIndex = Math.min(navStore.links.length - 1, navStore.currentLinkIndex + 1);
+            navStore.editorDrawerOpen = false;
+        }">
+            <Icon name="mdi:arrow-right" class="w-10 h-10" />
+        </div>
     </div>
 </template>
 
@@ -40,11 +53,11 @@
 import { useEditorStore } from '~/store/editorStore';
 import { useSettingsStore } from '~/store/settingStore';
 import { CursorShadowHandler } from '~/utils/canvasHandlers/cursorShadowHandler';
-
-
+import { useNavStore } from '~/store/navStore';
 
 const editorStore = useEditorStore();
 const settingsStore = useSettingsStore();
+const navStore = useNavStore();
 
 // watch(() => editorStore.layerNameDrawerSettings, () => {
 
@@ -80,13 +93,18 @@ watch(() => editorStore.layerNameToCanvas, () => {
     for (let i = editorStore.layerNameDisplayOrder.length - 1; i >= 0; i--) {
         let layerName = editorStore.layerNameDisplayOrder[i];
         let canvas = editorStore.layerNameToCanvas.get(layerName);
+        // center canvas in the container
         if (canvas) {
+            // canvas.style.marginLeft = 'auto';
+            // canvas.style.marginRight = 'auto';
             document.getElementById('layers')?.appendChild(canvas);
         }
     }
     editorStore.drawingLayerNameDisplayOrder.forEach((layerName) => {
         let canvas = editorStore.layerNameToCanvas.get(layerName);
         if (canvas) {
+            // canvas.style.marginLeft = 'auto';
+            // canvas.style.marginRight = 'auto';
             document.getElementById('layers')?.appendChild(canvas);
         }
     });
@@ -133,3 +151,9 @@ onBeforeUnmount(() => {
 });
 
 </script>
+
+<style scoped>
+#panContainer {
+    margin: 50px auto;
+}
+</style>

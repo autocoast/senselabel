@@ -430,10 +430,10 @@ export const useEditorStore = defineStore<'editorStore', EditorStore, EditorStor
                         ctx.putImageData(normalizeBy1And99Percentile([this.landsat8sr.rawBands.b4.raster, this.landsat8sr.rawBands.b3.raster, this.landsat8sr.rawBands.b2.raster], width, height), 0, 0);
                         break
                     case SatelliteType.landsat5toa:
-                        ctx.putImageData(normalizeBy1And99Percentile([this.landsat5toa.rawBands.b4.raster, this.landsat5toa.rawBands.b3.raster, this.landsat5toa.rawBands.b2.raster], width, height), 0, 0);
+                        ctx.putImageData(normalizeBy1And99Percentile([this.landsat5toa.rawBands.b3.raster, this.landsat5toa.rawBands.b2.raster, this.landsat5toa.rawBands.b1.raster], width, height), 0, 0);
                         break
                     case SatelliteType.landsat5sr:
-                        ctx.putImageData(normalizeBy1And99Percentile([this.landsat5sr.rawBands.b4.raster, this.landsat5sr.rawBands.b3.raster, this.landsat5sr.rawBands.b2.raster], width, height), 0, 0);
+                        ctx.putImageData(normalizeBy1And99Percentile([this.landsat5sr.rawBands.b3.raster, this.landsat5sr.rawBands.b2.raster, this.landsat5sr.rawBands.b1.raster], width, height), 0, 0);
                         break
                 }
                 ctx!.imageSmoothingEnabled = false;
@@ -475,12 +475,24 @@ export const useEditorStore = defineStore<'editorStore', EditorStore, EditorStor
             labelContainer.appendChild(legendCanvas);
 
             const pz = Panzoom(legendCanvas, {
-                maxScale: 20,
-                minScale: 0.1,
-                bounds: false,
-                boundsPadding: 0
+                // maxScale: 20,
+                // minScale: 0.1,
+                // bounds: false,
+                // boundsPadding: 0,
+                // contain: 'outside',
+                startScale: 0.5,
+                disablePan: false,
+                focal: { x: 0.5, y: 0.5 },
+                animate: false
             });
+            // zoom 50% out
+            pz.zoom(0.5);
             document.getElementById(legendCanvas.id)!.addEventListener('wheel', pz.zoomWithWheel);
+            
+            // document.getElementById(legendCanvas.id)!.addEventListener('wheel', function (event) {
+            //     event.preventDefault(); // Prevent default scrolling behavior
+            //     pz.zoomWithWheel(event, { focal: { x: legendCanvas.clientWidth / 2, y: legendCanvas.clientHeight / 2 } });
+            // });
 
             if (file.name.endsWith('.tif') || file.name.endsWith('.tiff')) {
                 try {
@@ -490,7 +502,7 @@ export const useEditorStore = defineStore<'editorStore', EditorStore, EditorStor
 
                     const width = image.getWidth();
                     const height = image.getHeight();
-                    console.log('Width:', width, 'Height:', height);
+
 
                     // Update canvas size to match the GeoTIFF dimensions
                     legendCanvas.width = Math.max(width, 200);
@@ -517,8 +529,6 @@ export const useEditorStore = defineStore<'editorStore', EditorStore, EditorStor
             } else {
                 const img = new Image();
                 img.onload = () => {
-                    console.log(img.width);
-                    console.log(img.height);
                     const ratio = img.width / img.height;
                     legendCanvas.width = Math.max(img.width, 200);
                     legendCanvas.height = Math.floor(legendCanvas.width / ratio);
@@ -540,8 +550,6 @@ export const useEditorStore = defineStore<'editorStore', EditorStore, EditorStor
             document.getElementById('layers')!.appendChild(imageLayerCanvas);
             let ctx = imageLayerCanvas.getContext('2d');
             let img = new Image();
-            console.log(width);
-            console.log(imageFile);
             img.src = URL.createObjectURL(imageFile);
             img.onload = () => {
                 ctx!.drawImage(img, 0, 0, width, height);
@@ -563,6 +571,8 @@ export const useEditorStore = defineStore<'editorStore', EditorStore, EditorStor
             this.selectLayer(layerName, false);
         },
         resetStore() {
+            document.getElementById('drawingContainer')!.innerHTML = '';
+            document.getElementById('layers')!.innerHTML = '';
             this.layerNameToCanvas = new Map<string, HTMLCanvasElement>();
             this.layerNameDisplayOrder = [];
             this.drawingLayerNameDisplayOrder = [];
