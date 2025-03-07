@@ -1,8 +1,8 @@
-
 # SenseLabel
 
 [![License](https://img.shields.io/badge/license-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Live Demo](https://img.shields.io/badge/demo-online-brightgreen)](https://senselabel.vercel.app)
+[![DOI](https://zenodo.org/badge/803788398.svg)](https://doi.org/10.5281/zenodo.14754469)
 
 **SenseLabel** is an open-source, web-based application for annotating remote sensing data. It is designed to assist researchers, analysts, and developers in labelling geospatial data efficiently. The tool supports multiple satellite format and, advanced visualization.
 
@@ -110,6 +110,27 @@ This project is licensed under the **GNU General Public License v3.0**. See the 
 Special thanks to Helmholtz Imaging and the open-source community for their support and contributions.
 
 ---
+
+## Citing
+
+If you use SenseLabel in your research, please cite it as:
+
+```bibtex
+@software{pogorzelski2024senselabel,
+    title        = {{SenseLabel}: {A} Flexible Framework for Remote 
+                   Sensing Data Annotation},
+    author       = {Pogorzelski, David and 
+                   Arlinghaus, Peter and 
+                   Karmakar, Chandrabali and 
+                   Camero, Andr\'{e}s and 
+                   Zhang, Wenyan},
+    year         = {2025},
+    version      = {1.0},
+    publisher    = {Zenodo},
+    doi          = {10.5281/zenodo.14754469},
+    url          = {https://github.com/autocoast/senselabel}
+}
+```
 
 ## Contact
 
